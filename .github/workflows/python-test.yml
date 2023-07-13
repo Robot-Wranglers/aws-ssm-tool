@@ -1,0 +1,27 @@
+# See also: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python Tests
+on:
+  workflow_call: {}
+  # push:
+  #   branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+permissions:
+  contents: read
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set Up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.9"         
+      - name: Install Deps
+        run: make init
+      - name: Static-Analysis
+        run: make static-analysis
+      - name: Unit Tests
+        run: make utest
