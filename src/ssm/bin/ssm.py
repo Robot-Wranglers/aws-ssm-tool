@@ -10,6 +10,7 @@ import click
 
 from ssm import api, cli, util
 from ssm.cli.wrapper import ApiWrapper
+
 LOGGER = util.get_logger(__name__)
 
 

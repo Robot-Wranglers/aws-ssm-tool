@@ -1,4 +1,4 @@
 """ ssm.abcs
     boilerplate for abstract base classes
 """
-from .loggable import Loggable # noqa
+from .loggable import Loggable  # noqa

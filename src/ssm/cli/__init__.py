@@ -2,9 +2,11 @@
 """
 
 import click
-from . import options, args # noqa
 
 from ssm import util
+
+from . import args, options  # noqa
+
 LOGGER = util.get_logger(__name__)
 
 
@@ -25,14 +27,14 @@ class Group(click.Group):
         result = root_commands + alias_commands
         return result
 
-    def command(self, *args, **kwargs):
+    def command(self, *_args, **kwargs):
         """
         Override  from super.
         """
         aliases = kwargs.pop("aliases", [])
 
         def decorator(f):
-            cmd = click.decorators.command(*args, **kwargs)(click.pass_context(f))
+            cmd = click.decorators.command(*_args, **kwargs)(click.pass_context(f))
             self.add_command(cmd)
             cmd.is_alias = False
             for alias in aliases:
