@@ -25,3 +25,5 @@ jobs:
         run: make static-analysis
       - name: Unit Tests
         run: make utest
+      - name: Smoke Tests
+        run: make stest

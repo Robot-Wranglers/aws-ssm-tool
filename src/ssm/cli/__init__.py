@@ -6,17 +6,18 @@ import click
 from ssm import util
 
 LOGGER = util.get_logger(__name__)
-from .wrapper import ApiWrapper
-from . import options, args
+
 
 class Group(click.Group):
     """
-    subclass of click.Group, mostly just for supporting command aliases
+    Subclass of click.Group, mostly just for supporting command aliases
     """
 
     def list_commands(self, ctx):
-        """override  from super.
-        this just re-orders aliases to the bottom of --help
+        """
+        Override  from super.
+
+        This just re-orders aliases to the bottom of --help
         """
         result = click.Group.list_commands(self, ctx)
         root_commands = [x for x in result if not self.commands[x].is_alias]
@@ -25,7 +26,9 @@ class Group(click.Group):
         return result
 
     def command(self, *args, **kwargs):
-        """override  from super."""
+        """
+        Override  from super.
+        """
         aliases = kwargs.pop("aliases", [])
 
         def decorator(f):
@@ -43,9 +46,6 @@ class Group(click.Group):
                 alias_cmd = click.decorators.command(**zz)
                 alias_cmd = alias_cmd(click.pass_context(g))
                 alias_cmd.params = cmd.params
-                # LOGGER.debug("setting {} params to {} params\n\t{}\n\t{}".format(
-                #     alias_cmd.name, cmd.name,
-                #     alias_cmd.params, cmd.params))
                 self.add_command(alias_cmd, name=alias)
                 alias_cmd.is_alias = True
             return cmd
