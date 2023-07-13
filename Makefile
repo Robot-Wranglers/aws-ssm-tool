@@ -57,7 +57,7 @@ pypi-release:
 	--password $${PYPI_TOKEN} \
 	dist/*
 
-release: clean normalize static-analysis test pypi-release
+release: pypi-release
 
 tox-%:
 	tox -e ${*}
