@@ -2,9 +2,9 @@
 """
 
 import click
+from . import options, args # noqa
 
 from ssm import util
-
 LOGGER = util.get_logger(__name__)
 
 
