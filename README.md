@@ -3,7 +3,7 @@
 <table width=100%>
   <tr>
     <td colspan=2><strong>
-    ssm-tool
+    aws-ssm-tool
       </strong>&nbsp;&nbsp;&nbsp;&nbsp;
       <small><small>
       </small></small>
@@ -36,10 +36,10 @@ See the [Usage section](#usage) for more details
 
 ## Installation
 
-See [pypi](https://pypi.org/project/ssm-tool/) for available releases.
+See [pypi](https://pypi.org/project/aws-ssm-tool/) for available releases.
 
 ```
-pip install ssm-tool
+pip install aws-ssm-tool
 ```
 
 ---------------------------------------------------------------------------------
