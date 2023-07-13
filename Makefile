@@ -13,7 +13,7 @@ SRC_ROOT := $(shell dirname ${THIS_MAKEFILE})
 NO_COLOR:=\033[0m
 COLOR_GREEN=\033[92m
 
-PYPI_PROJECT_NAME:=ssm
+PY_PKG_NAME:=ssm
 
 .PHONY: build docs
 
@@ -34,7 +34,7 @@ py-build: py-clean
 	&& (git tag $$version \
 	|| printf 'WARNING: Failed to git-tag with release-tag (this is normal if tag already exists).\n' > /dev/stderr) \
 	&& printf "# WARNING: file is maintained by automation\n\n__version__ = \"$${version}\"\n\n" \
-	| tee src/${PYPI_PROJECT_NAME}/_version.py \
+	| tee src/${PY_PKG_NAME}/_version.py \
 	&& python -m build
 
 py-clean:
