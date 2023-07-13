@@ -12,7 +12,7 @@
   <tr>
     <td width=15%><img src=img/icon.png style="width:150px"></td>
     <td>
-    Helper for interacting with SSM Parameter Store
+    Helper for interacting with SSM
     </td>
   </tr>
 </table>
@@ -23,7 +23,11 @@
 
 ## Overview
 
-This project provides the `ssm` tool, for interacting with secrets stored in [AWS SSM](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html)
+The [AWS SSM Parameter-Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) is great, but can be awkward to work with via the `awscli` tool.  This project provides the `ssm` tool as an alternative interface with simple CRUD.
+
+See [setup.cfg](setup.cfg) to find the latest info about required versions of boto.
+
+See the [Usage section](#usage) for more details
 
 ---------------------------------------------------------------------------------
 
@@ -39,7 +43,12 @@ pip install ssm-tool
 
 ## Usage
 
+After installation, you can invoke this tool as either `ssm` or `python -m ssm`.  
+Usage info follows:
+
 ```
+$ ssm --help
+
 Usage: ssm [OPTIONS] COMMAND [ARGS]...
 
   Tool for accessing secrets

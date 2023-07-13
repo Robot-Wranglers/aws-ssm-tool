@@ -1,2 +1,2 @@
 def test_imports():
-    assert True
+    import ssm # noqa
