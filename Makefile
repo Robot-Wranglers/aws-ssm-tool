@@ -51,13 +51,18 @@ version:
 
 
 pypi-release:
-	PYPI_RELEASE=1 make build \
+	PYPI_RELEASE=1 make py-build \
 	&& twine upload \
 	--user $${PYPI_USER} \
 	--password $${PYPI_TOKEN} \
 	dist/*
 
-release: pypi-release
+docker-release: docker-build
+	echo "docker-release not implemented yet"
+docker-build:
+	echo "docker-build not implemented yet"
+
+release: pypi-release docker-release
 
 tox-%:
 	tox -e ${*}
