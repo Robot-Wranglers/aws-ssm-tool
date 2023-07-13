@@ -13,11 +13,15 @@ SRC_ROOT := $(shell dirname ${THIS_MAKEFILE})
 NO_COLOR:=\033[0m
 COLOR_GREEN=\033[92m
 
-PYPI_PROJECT_NAME:=ssm-tool
+PYPI_PROJECT_NAME:=ssm
 
 .PHONY: build docs
 
-init:
+init: py-init
+build: py-build
+clean: py-clean
+
+py-init:
 	# $(call _announce_target, $@)
 	set -x \
 	; pip install build \
@@ -25,7 +29,7 @@ init:
 	; pip install --quiet -e .[testing] \
 	; pip install --quiet -e .[publish]
 
-build: clean
+py-build: py-clean
 	export version=`python setup.py --version` \
 	&& (git tag $$version \
 	|| printf 'WARNING: Failed to git-tag with release-tag (this is normal if tag already exists).\n' > /dev/stderr) \
@@ -33,10 +37,7 @@ build: clean
 	| tee src/${PYPI_PROJECT_NAME}/_version.py \
 	&& python -m build
 
-version:
-	@python setup.py --version
-
-clean:
+py-clean:
 	rm -rf tmp.pypi* dist/* build/* \
 	&& rm -rf src/*.egg-info/
 	find . -name '*.tmp.*' -delete
@@ -45,6 +46,10 @@ clean:
 	find . -type d -name .tox | xargs -n1 -I% bash -x -c "rm -rf %"
 	rmdir build || true
 
+version:
+	@python setup.py --version
+
+
 pypi-release:
 	PYPI_RELEASE=1 make build \
 	&& twine upload \
@@ -52,7 +57,7 @@ pypi-release:
 	--password $${PYPI_TOKEN} \
 	dist/*
 
-release: clean normalize static-analysis pypi-release
+release: clean normalize static-analysis test pypi-release
 
 tox-%:
 	tox -e ${*}

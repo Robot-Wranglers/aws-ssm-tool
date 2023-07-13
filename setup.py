@@ -1,36 +1,27 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import sys
+""" setup.py for ssm
+"""
 import os
-from setuptools import setup, find_packages
 
-PACKAGE_NAME = 'ssm'
+from setuptools import setup
 
-setup(
-    name=PACKAGE_NAME,
-    version='0.1',
-    author="robot-wranglers",
-    description="",
-    author_email='admin@example.com',
-    url='https://github.com/robot-wranglers/ssm',
-    packages=find_packages(),
-    install_requires=[],
-    include_package_data=True,
-    zip_safe=False,
-    dependency_links=[
-    ],
-    entry_points={
-        'console_scripts':
-        [
-            'ssm = {0}.bin.ssm:entry'.format(PACKAGE_NAME),
-        ]},
-    classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Developers',
-        'Natural Language :: English',
-        "Programming Language :: Python :: 2",
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
-    ],
-)
+GIT_COMMIT = os.environ.get("GIT_COMMIT", "local")
+if os.environ.get("PYPI_RELEASE", None):
+    USE_CALVER = f"%Y.%m.%d.%H.%M"
+else:
+    USE_CALVER = f"%Y.%m.%d+{GIT_COMMIT}"
+
+if __name__ == "__main__":
+    try:
+        setup(
+            # use_calver=f"%Y.%m.%d.%H.%M+{GIT_COMMIT}",
+            use_calver=USE_CALVER,
+            setup_requires=["setuptools", "calver"],
+        )
+    except:  # noqa
+        print(
+            "\n\nAn error occurred while building the project, "
+            "please ensure you have the most updated version of setuptools, "
+            "setuptools_scm and wheel with:\n"
+            "   pip install -U setuptools setuptools_scm wheel\n\n"
+        )
+        raise

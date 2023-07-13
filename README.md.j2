@@ -1,0 +1,74 @@
+<!--- This is a markdown file.  Comments look like this --->
+
+<table width=100%>
+  <tr>
+    <td colspan=2><strong>
+    ssm-tool
+      </strong>&nbsp;&nbsp;&nbsp;&nbsp;
+      <small><small>
+      </small></small>
+    </td>
+  </tr>
+  <tr>
+    <td width=15%><img src=img/icon.png style="width:150px"></td>
+    <td>
+    Helper for interacting with SSM Parameter Store
+    </td>
+  </tr>
+</table>
+
+{{markdown_toc(__template__, level=2)}}
+
+---------------------------------------------------------------------------------
+
+## Overview
+
+This project provides the `ssm` tool, for interacting with secrets stored in [AWS SSM](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html)
+
+---------------------------------------------------------------------------------
+
+## Installation
+
+See [pypi](https://pypi.org/project/ssm-tool/) for available releases.
+
+```
+pip install ssm-tool
+```
+
+---------------------------------------------------------------------------------
+
+## Usage
+
+```
+Usage: ssm [OPTIONS] COMMAND [ARGS]...
+
+  Tool for accessing secrets
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  copy       copy a secret
+  delete     delete secret (keeping a local-backup is default)
+  get-many   get many secrets from hierarchy/namespace
+  list       list prefixes below the given path
+  move       move a secret
+  move-many  move a whole path of secrets
+  put-many   put many secrets
+  read       get a secret
+  update     put a secret
+  cp         ALIAS for `copy`
+  get        ALIAS for `read`
+  get-path   ALIAS for `get-many`
+  ls         ALIAS for `list`
+  move-path  ALIAS for `move-many`
+  mv         ALIAS for `move`
+  mv-many    ALIAS for `move-many`
+  mv-path    ALIAS for `move-many`
+  put        ALIAS for `update`
+  put-path   ALIAS for `put-many`
+  rm         ALIAS for `delete`
+  set        ALIAS for `update`
+```
+
+---------------------------------------------------------------------------------
