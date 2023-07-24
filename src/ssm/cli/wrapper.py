@@ -74,19 +74,12 @@ class ApiWrapper(abcs.Loggable):
         @functools.wraps(self.fxn)
         def proxy(*args, **kwargs):
             """ """
-            # if args and isinstance(args[0],(click.core.Context,)):
-            #     # none of the api commands are anticipating the click context
-            #     args = args[1:]
             args = [x for x in args if not isinstance(x, (click.core.Context,))]
-            LOGGER.debug(f"proxying args={args}, kwargs={kwargs}")
+            # LOGGER.info(f"proxying args={args}, kwargs={kwargs}")
             api_result = self.fxn(*args, **kwargs)
             print(api_result)
-            if not isinstance(api_result, (dict, list)):
-                LOGGER.warning("api result returned was not JSON!")
-            # if util.is_string(api_result):
-            #     print(result)
-            # else:
-            #     print(json.dumps(api_result, indent=2))
+            # if not isinstance(api_result, (dict, list)):
+            #     LOGGER.warning("api result returned was not JSON!")
             return api_result
 
         for option in options:
@@ -107,5 +100,4 @@ class ApiWrapper(abcs.Loggable):
             )
             LOGGER.critical(err)
             raise RuntimeError(err)
-        # print(result)
         return result
