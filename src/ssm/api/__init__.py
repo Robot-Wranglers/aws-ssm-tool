@@ -18,7 +18,7 @@ LOGGER = util.get_logger(__name__)
 def _get_env(env=None, **kwargs):
     assert env
     env = Environment.from_profile(env) if util.is_string(env) else env
-    env.logger.info("this environment will be used for retrieving secrets")
+    LOGGER.info(f"using {env}")
     return env
 
 
@@ -42,7 +42,7 @@ def read(secret_name, **kwargs):
         raise SystemExit(1)
 
 
-def stat(format="stdout", **kwargs):
+def stat(path="/", format="stdout", **kwargs):
     """
     reports status, including account details and metadata summary for SSM parameters.
     """
@@ -57,24 +57,26 @@ def stat(format="stdout", **kwargs):
             ),
             account=dict(
                 profile_name=env.profile_name,
-                id=caller_id.get("Account"),
+                id=env.account_id,
                 alias=env.account_alias,
                 region_name=env.region_name,
             ),
         )
     )
-    result.update(parameters=dict(count=len(env.secrets.under("/"))))
-    # import IPython; IPython.embed()
+    result.update(parameters=dict(root=path, count=len(env.secrets.under("/"))))
     if format in ["yaml", "yml"]:
         return yaml.dump(result)
     elif format in ["json"]:
         return json.dumps(result)
     elif format in ["stdout"]:
-        from ssm.util import rich_walk_dict, Tree, rich_print
-        tree = Tree("", guide_style="bold bright_blue",)
-        rich_walk_dict(result, tree)
-        rich_print(tree)
+        tree = util.Tree(
+            "",
+            guide_style="bold bright_blue",
+        )
+        util.rich_walk_dict(result, tree)
+        util.rich_print(tree)
         return tree
+
 
 def list(secret_name, format="stdout", **kwargs):
     """

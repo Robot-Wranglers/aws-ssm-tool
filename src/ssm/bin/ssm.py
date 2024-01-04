@@ -46,7 +46,7 @@ stat = ApiWrapper(
     aliases=["st"],
     extra_options=[
         cli.options.env,
-        cli.options.file_format_stdout_default,        
+        cli.options.file_format_stdout_default,
     ],
 )
 

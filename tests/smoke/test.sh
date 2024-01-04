@@ -2,3 +2,4 @@
 set -xeuo pipefail
 python -m ssm --help
 ssm --help
+ssm stat --format json | jq .

@@ -14,7 +14,7 @@ class SecretManager(abcs.Loggable):
     def __init__(self, env=None, **kwargs):
         assert env is not None
         self.env = env
-        self.logger_name = f"{repr(self.env)}[Secrets]"
+        self.logger_name = f"<Secrets[{repr(self.env)}]>"
         super().__init__(**kwargs)
 
     def __getitem__(self, name):
