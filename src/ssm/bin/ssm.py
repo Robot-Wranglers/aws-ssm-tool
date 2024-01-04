@@ -1,6 +1,7 @@
-"""
-See the docs here:
-  https://github.com/elo-enterprises/aws-secrets
+""" ssm.bin.ssm
+
+  Command-line entry-points.  
+  (This file makes parts of `ssm.api` available via click)
 """
 
 
@@ -40,7 +41,7 @@ list = ApiWrapper(
     ],
 )
 
-stat =  ApiWrapper(
+stat = ApiWrapper(
     fxn=api.stat,
     aliases=["st"],
     extra_options=[
@@ -86,6 +87,7 @@ move = ApiWrapper(
         click.argument("src_name", nargs=1),
     ],
 )
+
 move_many = ApiWrapper(
     fxn=api.move_many,
     aliases=["mv-many", "move-path", "mv-path"],
@@ -96,6 +98,7 @@ move_many = ApiWrapper(
         click.argument("src_name", nargs=1),
     ],
 )
+
 copy = ApiWrapper(
     fxn=api.copy,
     aliases=["cp"],
@@ -106,6 +109,7 @@ copy = ApiWrapper(
         click.argument("src_name", nargs=1),
     ],
 )
+
 update = ApiWrapper(
     fxn=api.update,
     aliases=["put", "set"],
@@ -116,6 +120,7 @@ update = ApiWrapper(
         cli.args.secret_name,
     ],
 )
+
 get_many = ApiWrapper(
     fxn=api.get_many,
     aliases=["get-path"],
@@ -126,6 +131,7 @@ get_many = ApiWrapper(
         cli.args.namespace,
     ],
 )
+
 put_many = ApiWrapper(
     fxn=api.put_many,
     aliases=["put-path"],

@@ -1,15 +1,15 @@
 """ ssm.api
 
-See the docs here:
-  https://github.com/elo-enterprises/aws-secrets
+  See the docs here:
+    https://github.com/Robot-Wranglers/aws-ssm-tool
 """
 
 import json
+import collections
 
 import yaml
 
-from ssm import util  # chatops, keybase
-
+from ssm import util
 from ssm.api.environment import Environment
 
 LOGGER = util.get_logger(__name__)
@@ -20,6 +20,7 @@ def _get_env(env=None, **kwargs):
     env = Environment.from_profile(env) if util.is_string(env) else env
     env.logger.info("this environment will be used for retrieving secrets")
     return env
+
 
 def _get_handle(**kwargs):
     """ """
@@ -39,36 +40,38 @@ def read(secret_name, **kwargs):
     except KeyError as exc:
         LOGGER.error(f"KeyError: {exc}")
         raise SystemExit(1)
-import collections
-def stat(format='json', **kwargs):
-    """ report status, including account details and metadata summary for SSM parameters"""
+
+
+def stat(format="json", **kwargs):
+    """report status, including account details and metadata summary for SSM parameters"""
     env = _get_env(**kwargs)
-    account_alias = '?'
-    account_id = '?'
-    caller_id=env.sts.get_caller_identity()
+    account_alias = "?"
+    account_id = "?"
+    caller_id = env.sts.get_caller_identity()
     aliases = env.iam.list_account_aliases()
-    aliases = aliases and aliases.get('AccountAliases')
+    aliases = aliases and aliases.get("AccountAliases")
     result = collections.OrderedDict()
     result.update(
         context=dict(
             user=dict(
-                id = caller_id.get('UserId'),
-                arn=caller_id.get('Arn'),
+                id=caller_id.get("UserId"),
+                arn=caller_id.get("Arn"),
             ),
             account=dict(
                 profile_name=env.profile_name,
-                id=caller_id.get('Account'),
+                id=caller_id.get("Account"),
                 alias=aliases and aliases[0] or None,
                 region_name=env.region_name,
-            )))
-    result.update(
-        parameters=dict(
-            count = len(env.secrets.under('/'))))
+            ),
+        )
+    )
+    result.update(parameters=dict(count=len(env.secrets.under("/"))))
     # import IPython; IPython.embed()
     if format in ["yaml", "yml"]:
         return yaml.dump(result)
     elif format in ["json"]:
         return json.dumps(result)
+
 
 def list(secret_name, format="stdout", **kwargs):
     """

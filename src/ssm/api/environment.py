@@ -44,7 +44,6 @@ class Environment(
             raise KeyError(err.format(normal_name, cls.ENV_CONFIGS))
         return cls(config=config)
 
-
     @property
     def profile_name(self):
         """
@@ -57,6 +56,7 @@ class Environment(
     @property
     def account_id(self):
         return self.config.get("account_id")
+
     @property
     def account_alias(self):
         return self.config.get("account_alias")
@@ -168,6 +168,7 @@ class Environment(
         (see ssm for more info)
         """
         return SecretManager(env=self)
+
 
 Environment.ENV_CONFIGS = collections.OrderedDict()
 Environment.ALL_PROFS = session.Session().available_profiles
