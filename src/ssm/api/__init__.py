@@ -10,18 +10,20 @@ import yaml
 
 from ssm import util  # chatops, keybase
 
-from .environment import Environment
+from ssm.api.environment import Environment
 
 LOGGER = util.get_logger(__name__)
 
 
-# @util.memoized
-def _get_handle(env=None, **kwargs):
-    """ """
+def _get_env(env=None, **kwargs):
     assert env
     env = Environment.from_profile(env) if util.is_string(env) else env
     env.logger.info("this environment will be used for retrieving secrets")
-    return env.secrets
+    return env
+
+def _get_handle(**kwargs):
+    """ """
+    return _get_env(**kwargs).secrets
 
 
 def read(secret_name, **kwargs):
@@ -37,11 +39,40 @@ def read(secret_name, **kwargs):
     except KeyError as exc:
         LOGGER.error(f"KeyError: {exc}")
         raise SystemExit(1)
-
+import collections
+def stat(format='json', **kwargs):
+    """ report status, including account details and metadata summary for SSM parameters"""
+    env = _get_env(**kwargs)
+    account_alias = '?'
+    account_id = '?'
+    caller_id=env.sts.get_caller_identity()
+    aliases = env.iam.list_account_aliases()
+    aliases = aliases and aliases.get('AccountAliases')
+    result = collections.OrderedDict()
+    result.update(
+        context=dict(
+            user=dict(
+                id = caller_id.get('UserId'),
+                arn=caller_id.get('Arn'),
+            ),
+            account=dict(
+                profile_name=env.profile_name,
+                id=caller_id.get('Account'),
+                alias=aliases and aliases[0] or None,
+                region_name=env.region_name,
+            )))
+    result.update(
+        parameters=dict(
+            count = len(env.secrets.under('/'))))
+    # import IPython; IPython.embed()
+    if format in ["yaml", "yml"]:
+        return yaml.dump(result)
+    elif format in ["json"]:
+        return json.dumps(result)
 
 def list(secret_name, format="stdout", **kwargs):
     """
-    list prefixes below the given path
+    list parameters with prefixes below the given path
     """
     secrets = _get_handle(**kwargs)
     return "\n".join(secrets.under(secret_name).keys())

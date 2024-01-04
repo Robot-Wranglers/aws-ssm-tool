@@ -40,6 +40,14 @@ list = ApiWrapper(
     ],
 )
 
+stat =  ApiWrapper(
+    fxn=api.stat,
+    aliases=["st"],
+    extra_options=[
+        cli.options.env,
+    ],
+)
+
 read = ApiWrapper(
     fxn=api.read,
     aliases=["get"],
