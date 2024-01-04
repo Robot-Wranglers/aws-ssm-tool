@@ -52,16 +52,25 @@ class Environment(
         return self.config.get("profile_name")
 
     profile = profile_name
-
-    @property
-    def account_id(self):
-        return self.config.get("account_id")
+    
+    @property 
+    def account_aliases(self):
+        """ """
+        aliases = self.iam.list_account_aliases()
+        return aliases and aliases.get("AccountAliases")
 
     @property
     def account_alias(self):
-        return self.config.get("account_alias")
-
-    # account = account_id
+        aliases = self.account_aliases
+        return aliases and aliases[0] or None
+    
+    @property 
+    def caller_id(self):
+        return self.sts.get_caller_identity()
+    
+    @property
+    def account_id(self):
+        return self.config.get("account_id")
 
     @property
     def region_name(self):
@@ -157,7 +166,7 @@ class Environment(
         human friendly strings for things like console
         output, i.e. with `secrets shell`, or logging
         """
-        return f"<Environment: {self.name} @ {self.profile_name}>"
+        return f"<Environment: {self.profile_name} @ {self.account_id}>"
 
     __repr__ = __str__
 

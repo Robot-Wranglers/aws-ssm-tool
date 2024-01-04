@@ -42,14 +42,12 @@ def read(secret_name, **kwargs):
         raise SystemExit(1)
 
 
-def stat(format="json", **kwargs):
-    """report status, including account details and metadata summary for SSM parameters"""
+def stat(format="stdout", **kwargs):
+    """
+    reports status, including account details and metadata summary for SSM parameters.
+    """
     env = _get_env(**kwargs)
-    account_alias = "?"
-    account_id = "?"
-    caller_id = env.sts.get_caller_identity()
-    aliases = env.iam.list_account_aliases()
-    aliases = aliases and aliases.get("AccountAliases")
+    caller_id = env.caller_id
     result = collections.OrderedDict()
     result.update(
         context=dict(
@@ -60,7 +58,7 @@ def stat(format="json", **kwargs):
             account=dict(
                 profile_name=env.profile_name,
                 id=caller_id.get("Account"),
-                alias=aliases and aliases[0] or None,
+                alias=env.account_alias,
                 region_name=env.region_name,
             ),
         )
@@ -71,7 +69,12 @@ def stat(format="json", **kwargs):
         return yaml.dump(result)
     elif format in ["json"]:
         return json.dumps(result)
-
+    elif format in ["stdout"]:
+        from ssm.util import rich_walk_dict, Tree, rich_print
+        tree = Tree("", guide_style="bold bright_blue",)
+        rich_walk_dict(result, tree)
+        rich_print(tree)
+        return tree
 
 def list(secret_name, format="stdout", **kwargs):
     """

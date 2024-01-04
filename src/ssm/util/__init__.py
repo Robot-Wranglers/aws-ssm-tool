@@ -12,8 +12,22 @@ green = functools.partial(termcolor.colored, color="green")
 yellow = functools.partial(termcolor.colored, color="yellow")
 bold = functools.partial(termcolor.colored, attrs=["bold"])
 
+from rich.tree import Tree
+from rich import print as rich_print
+from rich.text import Text
+def rich_walk_dict(dct, tree: Tree, branch_color='[bold magenta]') -> None:
+    """ recursively build a Tree with dict contents """
+    for k,v in dct.items():
+        if isinstance(v,(dict,)):
+            style = "dim"
+            branch = tree.add(
+                f"{branch_color}{k}",
+                style=style, guide_style=style,)
+            rich_walk_dict(v, branch)
+        else:
+            tree.add(Text(f"{k}", "green") + Text(": ")+Text(f"{v}"))
 
-def is_string(obj):
+def is_string(obj) -> bool:
     return isinstance(obj, str)
 
 
