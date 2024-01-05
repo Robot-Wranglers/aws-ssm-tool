@@ -38,6 +38,7 @@ list = ApiWrapper(
     extra_options=[
         cli.options.env,
         cli.args.secret_name,
+        cli.options.file_format_stdout_default,
     ],
 )
 

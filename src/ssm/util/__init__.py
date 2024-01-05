@@ -5,10 +5,10 @@ import functools
 
 import termcolor
 import coloredlogs
-
 from rich.text import Text
 from rich.tree import Tree
-from rich import print as rich_print # noqa
+
+from rich import print as rich_print  # noqa
 
 blue = functools.partial(termcolor.colored, color="blue")
 red = functools.partial(termcolor.colored, color="red")
@@ -47,7 +47,9 @@ def get_logger(name):
     utility function for returning a logger
     with standard formatting patterns, etc
     """
-
+    import os 
+    if os.path.exists(name):
+        name = name.replace(os.path.expanduser('~/'),'')
     class DuplicateFilter(logging.Filter):
         def filter(self, record):
             # add other fields if you need more granular comparison, depends on your app

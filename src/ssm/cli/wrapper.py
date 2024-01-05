@@ -2,8 +2,10 @@
     Reusable wrapper for building CLIs
 """
 
+import json
 import functools
 
+import yaml
 import click
 
 from ssm import abcs, util
@@ -76,11 +78,49 @@ class ApiWrapper(abcs.Loggable):
             """ """
             args = [x for x in args if not isinstance(x, (click.core.Context,))]
             # LOGGER.info(f"proxying args={args}, kwargs={kwargs}")
-            api_result = self.fxn(*args, **kwargs)
-            print(api_result)
+            format = kwargs.get("format", "stdout")
+            result = self.fxn(*args, **kwargs)
+            if format in ["yaml", "yml"]:
+                print(yaml.dump(result))
+            elif format in ["json"]:
+                print(json.dumps(result))
+            elif format in ["python"]:
+                print(result)
+            elif format in ["env"]:
+                assert isinstance(result,(dict,)),f'expected dict, got {type(result)}'
+                acc = []
+                for k, v in result.items():
+                    if isinstance(v,(str,)) and ' ' in v:
+                        LOGGER.warning(f"user requested format is `env` but value has a space character!")
+                    tmp = "=".join([k.split("/")[-1], v])
+                    acc.append(tmp)
+                print("\n".join(acc))
+            elif format in ["stdout"]:
+                if isinstance(result, (list,)):
+                    print("\n".join(result))
+                elif isinstance(result,(dict,)):
+                    tree = util.Tree(
+                        "",
+                        guide_style="bold bright_blue",
+                    )
+                    util.rich_walk_dict(result, tree)
+                    util.rich_print(tree)
+                else:
+                    util.rich_print(result)
+            else:
+                raise RuntimeError(f"unrecognized output format `{format}`")
+
+# if format in ["yaml", "yml"]:
+#     return yaml.dump(result)
+# elif format in ["json"]:
+#     return json.dumps(result)
+# elif format in ["stdout"]:
+#     return tree
+            # "\n".join(result)
+            # print(api_result)
             # if not isinstance(api_result, (dict, list)):
             #     LOGGER.warning("api result returned was not JSON!")
-            return api_result
+            # return result
 
         for option in options:
             proxy = option(proxy)

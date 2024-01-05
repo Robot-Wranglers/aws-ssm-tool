@@ -16,9 +16,10 @@ LOGGER = util.get_logger(__name__)
 
 
 def _get_env(env=None, **kwargs):
-    assert env
+    """ """
     env = Environment.from_profile(env) if util.is_string(env) else env
-    LOGGER.info(f"using {env}")
+    env.logger.info("getting client")
+    assert env
     return env
 
 
@@ -33,8 +34,6 @@ def read(secret_name, **kwargs):
     """
     assert secret_name, f"cannot read secret_name `{secret_name}`"
     secrets = _get_handle(**kwargs)
-
-    # print(value,  file=sys.stdout)
     try:
         return secrets[secret_name]
     except KeyError as exc:
@@ -64,46 +63,29 @@ def stat(path="/", format="stdout", **kwargs):
         )
     )
     result.update(parameters=dict(root=path, count=len(env.secrets.under("/"))))
-    if format in ["yaml", "yml"]:
-        return yaml.dump(result)
-    elif format in ["json"]:
-        return json.dumps(result)
-    elif format in ["stdout"]:
-        tree = util.Tree(
-            "",
-            guide_style="bold bright_blue",
-        )
-        util.rich_walk_dict(result, tree)
-        util.rich_print(tree)
-        return tree
+    return result
+    
 
 
-def list(secret_name, format="stdout", **kwargs):
+def list(secret_name, **kwargs):
     """
     list parameters with prefixes below the given path
     """
+    # WARNING: do not use `list()` here..
     secrets = _get_handle(**kwargs)
-    return "\n".join(secrets.under(secret_name).keys())
+    result = secrets.under(secret_name).keys()
+    result = [x for x in result]
+    return result
 
 
-def get_many(namespace, format="python", **kwargs):
+def get_many(namespace, **kwargs):
     """
     get many secrets from hierarchy/namespace
     """
     assert format, "output format is required"
     secrets = _get_handle(**kwargs)
     result = secrets.under(namespace)
-    if format in ["python"]:
-        return result
-    if format in ["yaml", "yml"]:
-        return yaml.dump(result)
-    elif format in ["json"]:
-        return json.dumps(result)
-    elif format in ["env"]:
-        return "\n".join(["=".join([k.split("/")[-1], v]) for k, v in result.items()])
-    else:
-        raise RuntimeError(f"unrecognized output format `{format}`")
-
+    return result 
 
 def delete(secret_name, no_backup=False, **kwargs):
     """delete secret (keeping a local-backup is default)"""
@@ -159,7 +141,7 @@ def copy(src_name, dest_name, src_env=None, dest_env=None, **kwargs):
     dest_name = dest_name or src_name
     value = src_env[src_name]
     dest_env[dest_name] = value
-
+    return True
 
 def update(secret_name, value, file=None, **kwargs):
     """
@@ -179,5 +161,5 @@ def update(secret_name, value, file=None, **kwargs):
 
 
 def put_many(secret_name, input_file=None, **kwargs):  # noqa
-    """put many secrets"""
+    """ put many secrets """
     raise NotImplementedError()

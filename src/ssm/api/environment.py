@@ -89,7 +89,7 @@ class Environment(
             raise ValueError(err.format(config))
         self.config = config
         self.name = self.config["name"]
-        self.logger_name = "ENV"
+        self.logger_name = f"<Env@{self.name}>"
         self.init_session()
         super().__init__(**kwargs)
 
@@ -181,15 +181,15 @@ class Environment(
 
 Environment.ENV_CONFIGS = collections.OrderedDict()
 Environment.ALL_PROFS = session.Session().available_profiles
-tmp = "loading environments from {} available profiles.."
-LOGGER.debug(tmp.format(len(Environment.ALL_PROFS)))
+tmp = "loading envs from {} available profiles"
+LOGGER.info(tmp.format(len(Environment.ALL_PROFS)))
 for profile_name in Environment.ALL_PROFS:
     # LOGGER.debug("\t{}".format(profile_name))
     Environment.ENV_CONFIGS[profile_name] = dict(
         profile_name=profile_name,
     )
-LOGGER.debug("normalizing and pre-computing env metadata")
+LOGGER.info("loading metadata from envs")
 for env_name, env_config in Environment.ENV_CONFIGS.copy().items():
-    LOGGER.debug(f"\t- {env_name}")
+    LOGGER.info(f"\t- {env_name}")
     env_config["name"] = Environment.normalize_env_name(env_name)
-LOGGER.debug("done loading environment configs")
+LOGGER.info("done loading environment configs")
