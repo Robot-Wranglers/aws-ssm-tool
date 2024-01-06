@@ -6,6 +6,8 @@
 
 import collections
 
+import botocore
+
 from ssm import util
 from ssm.api.environment import Environment
 
@@ -93,18 +95,25 @@ def delete(secret_name, no_backup=False, **kwargs):
         return ".tmp.{}".format(prefix.replace("/", "_"))
 
     secrets = _get_handle(**kwargs)
-    parameter = read(secret_name=secret_name, **kwargs)
-    if not no_backup:
-        backup = get_backup_file(secret_name)
-        LOGGER.debug(f"backup to: {backup}")
-        with open(backup, "w") as fhandle:
-            fhandle.write(parameter)
+    try:
+        parameter = read(secret_name=secret_name, **kwargs)
+    except (botocore.exceptions.ClientError,) as exc:
+        LOGGER.warning(f"error reading secret @ `{secret_name}` (is this a path?)")
+        parameter = None
+    if parameter is not None:
+        if not no_backup:
+            backup = get_backup_file(secret_name)
+            LOGGER.debug(f"backup to: {backup}")
+            with open(backup, "w") as fhandle:
+                fhandle.write(parameter)
         del secrets[secret_name]
         return parameter
+    else:
+        return False
 
 
 def move(src_name, dest_name, src_env=None, dest_env=None, **kwargs):
-    """move a secret"""
+    """moves a secret from src to dest"""
     result = copy(src_name, dest_name, src_env=src_env, dest_env=dest_env, **kwargs)
     src_env = Environment.from_profile(src_env)
     del src_env.secrets[src_name]
@@ -113,7 +122,7 @@ def move(src_name, dest_name, src_env=None, dest_env=None, **kwargs):
 
 def move_many(src_name, dest_name, **kwargs):
     """
-    move a whole path of secrets
+    moves a whole path of secrets to a new location
     """
     dest_name = dest_name[:-1] if dest_name.endswith("/") else dest_name
     secrets = _get_handle(**kwargs)
@@ -133,7 +142,9 @@ def move_many(src_name, dest_name, **kwargs):
 
 
 def copy(src_name, dest_name, src_env=None, dest_env=None, **kwargs):
-    """copy a secret"""
+    """
+    copies a secret from src to dest
+    """
     # NB: mind the signature, this code is reused by `move`
     src_env = _get_handle(env=src_env)
     dest_env = _get_handle(env=dest_env)
@@ -160,6 +171,13 @@ def update(secret_name, value, file=None, **kwargs):
     return True
 
 
+def delete_path(path_prefix, **kwargs):
+    """ """
+    raise NotImplementedError()
+
+
 def put_many(secret_name, input_file=None, **kwargs):  # noqa
-    """put many secrets"""
+    """
+    put many secrets
+    """
     raise NotImplementedError()
