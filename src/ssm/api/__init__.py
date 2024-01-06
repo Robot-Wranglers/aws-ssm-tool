@@ -4,10 +4,7 @@
     https://github.com/Robot-Wranglers/aws-ssm-tool
 """
 
-import json
 import collections
-
-import yaml
 
 from ssm import util
 from ssm.api.environment import Environment
@@ -41,7 +38,7 @@ def read(secret_name, **kwargs):
         raise SystemExit(1)
 
 
-def stat(path="/", format="stdout", **kwargs):
+def stat(path="/", **kwargs):
     """
     reports status, including account details and metadata summary for SSM parameters.
     """
@@ -64,7 +61,6 @@ def stat(path="/", format="stdout", **kwargs):
     )
     result.update(parameters=dict(root=path, count=len(env.secrets.under("/"))))
     return result
-    
 
 
 def list(secret_name, **kwargs):
@@ -78,14 +74,17 @@ def list(secret_name, **kwargs):
     return result
 
 
-def get_many(namespace, **kwargs):
+def get_many(namespace, flat_output: bool = False, **kwargs):
     """
-    get many secrets from hierarchy/namespace
+    get many secrets from specified hierarchy/namespace
     """
-    assert format, "output format is required"
+    # assert format, "output format is required"
     secrets = _get_handle(**kwargs)
     result = secrets.under(namespace)
-    return result 
+    if flat_output:
+        result = util.flatten_output(result)
+    return result
+
 
 def delete(secret_name, no_backup=False, **kwargs):
     """delete secret (keeping a local-backup is default)"""
@@ -143,6 +142,7 @@ def copy(src_name, dest_name, src_env=None, dest_env=None, **kwargs):
     dest_env[dest_name] = value
     return True
 
+
 def update(secret_name, value, file=None, **kwargs):
     """
     put a secret
@@ -161,5 +161,5 @@ def update(secret_name, value, file=None, **kwargs):
 
 
 def put_many(secret_name, input_file=None, **kwargs):  # noqa
-    """ put many secrets """
+    """put many secrets"""
     raise NotImplementedError()

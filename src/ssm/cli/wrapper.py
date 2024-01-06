@@ -87,18 +87,19 @@ class ApiWrapper(abcs.Loggable):
             elif format in ["python"]:
                 print(result)
             elif format in ["env"]:
-                assert isinstance(result,(dict,)),f'expected dict, got {type(result)}'
+                assert isinstance(result, (dict,)), f"expected dict, got {type(result)}"
                 acc = []
                 for k, v in result.items():
-                    if isinstance(v,(str,)) and ' ' in v:
-                        LOGGER.warning(f"user requested format is `env` but value has a space character!")
+                    if isinstance(v, (str,)) and " " in v:
+                        msg = "user requested format is `env` but value has a space character!"
+                        LOGGER.warning(msg)
                     tmp = "=".join([k.split("/")[-1], v])
                     acc.append(tmp)
                 print("\n".join(acc))
             elif format in ["stdout"]:
                 if isinstance(result, (list,)):
                     print("\n".join(result))
-                elif isinstance(result,(dict,)):
+                elif isinstance(result, (dict,)):
                     tree = util.Tree(
                         "",
                         guide_style="bold bright_blue",
@@ -109,18 +110,6 @@ class ApiWrapper(abcs.Loggable):
                     util.rich_print(result)
             else:
                 raise RuntimeError(f"unrecognized output format `{format}`")
-
-# if format in ["yaml", "yml"]:
-#     return yaml.dump(result)
-# elif format in ["json"]:
-#     return json.dumps(result)
-# elif format in ["stdout"]:
-#     return tree
-            # "\n".join(result)
-            # print(api_result)
-            # if not isinstance(api_result, (dict, list)):
-            #     LOGGER.warning("api result returned was not JSON!")
-            # return result
 
         for option in options:
             proxy = option(proxy)

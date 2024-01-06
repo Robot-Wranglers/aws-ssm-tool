@@ -18,7 +18,8 @@ LOGGER = util.get_logger(__name__)
 @click.command(cls=cli.Group)
 def entry(*args, **kargs):  # noqa
     """
-    Tool for accessing secrets
+    SSM tool, a small helper for interacting with Amazon Simple Systems Manager
+    for secrets storage/retrieval.
     """
     # this could update global settings here
     # ctx = {}
@@ -129,7 +130,8 @@ get_many = ApiWrapper(
     extra_options=[
         cli.options.env,
         cli.options.cascade,
-        cli.options.file_format,
+        cli.options.flat_output,
+        cli.options.file_format_yaml_default,
         cli.args.namespace,
     ],
 )

@@ -33,7 +33,17 @@ def rich_walk_dict(dct, tree: Tree, branch_color="[bold magenta]") -> None:
 
 
 def is_string(obj) -> bool:
+    """ """
     return isinstance(obj, str)
+
+
+def flatten_output(result: dict) -> dict:
+    """ """
+    acc = {}
+    for k, v in result.items():
+        tmp = k.split("/")
+        acc[tmp[-1]] = v
+    return acc
 
 
 def fatal_error(msg):
@@ -47,9 +57,11 @@ def get_logger(name):
     utility function for returning a logger
     with standard formatting patterns, etc
     """
-    import os 
+    import os
+
     if os.path.exists(name):
-        name = name.replace(os.path.expanduser('~/'),'')
+        name = name.replace(os.path.expanduser("~/"), "")
+
     class DuplicateFilter(logging.Filter):
         def filter(self, record):
             # add other fields if you need more granular comparison, depends on your app

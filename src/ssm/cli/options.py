@@ -29,6 +29,7 @@ filter_service = filter_service_partial(default=".*")
 file_format_partial = partial(
     click.option,
     "--format",
+    show_default=True,
     type=click.Choice(["json", "yaml", "yml", "env", "stdout"]),
     help="file format",
 )
@@ -120,6 +121,14 @@ cascade_partial = partial(
 )
 cascade = cascade_partial(default=True)
 no_cascade = cascade_partial(default=False)
+
+flat_output = click.option(
+    "--flat-output",
+    is_flag=True,
+    show_default=True,
+    default=False,
+    help="flattens output of `/deeply/nested/paths` as simply `path`",
+)
 
 no_cascade = click.option(
     "--no-cascade",
