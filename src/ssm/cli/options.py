@@ -7,14 +7,6 @@ from functools import partial
 
 import click
 
-cluster = click.option(
-    "--cluster",
-    required=False,
-    default="",
-    help="cluster to use (defaults to autodetection from env)",
-)
-comment = click.option("--comment", help="comment or description", required=False)
-container = click.option("--container", help="container to enter", required=False)
 key = click.option("--key", help="key to use", default="", required=False)
 
 top = click.option(
@@ -26,18 +18,18 @@ filter_service_partial = partial(
 )
 filter_service = filter_service_partial(default=".*")
 
-file_format_partial = partial(
+output_format_partial = partial(
     click.option,
     "--format",
     show_default=True,
     type=click.Choice(["json", "yaml", "yml", "env", "stdout"]),
-    help="file format",
+    help="output format",
 )
-file_format = format = file_format_partial(required=True)
-file_format_yaml_default = file_format_partial(required=False, default="yaml")
-file_format_json_default = file_format_partial(required=False, default="json")
-file_format_stdout_default = file_format_partial(required=False, default="stdout")
-required_dest_bucket = dest_bucket = click.option(
+output_format = format = output_format_partial(required=True)
+output_format_yaml_default = output_format_partial(required=False, default="yaml")
+output_format_json_default = output_format_partial(required=False, default="json")
+output_format_stdout_default = output_format_partial(required=False, default="stdout")
+required_dst_bucket = dst_bucket = click.option(
     "--dest-bucket", envvar="DEST_BUCKET", help="dest bucket name", required=True
 )
 
@@ -76,24 +68,12 @@ optional_prefix = click.option(
     "--prefix", help="src prefix to operate under", required=False, default=""
 )
 
-dest_prefix = click.option(
+dst_prefix = click.option(
     "--dest-prefix",
     envvar="DEST_PREFIX",
     help="dest prefix to operate under",
     required=False,
     default="",
-)
-
-required_user = click.option(
-    "--user", help="username to use", required=True, default=""
-)
-
-optional_src_bucket = click.option(
-    "--src-bucket", envvar="SRC_BUCKET", help="src bucket name", required=False
-)
-
-required_src_bucket = click.option(
-    "--src-bucket", envvar="SRC_BUCKET", help="src bucket name", required=True
 )
 
 command = click.option(
@@ -109,8 +89,6 @@ required_command = click.option(
     default="",
     help="Command to run (like bash -c)",
 )
-
-script = click.option("--script", "-s", help="Script to run", default="")
 
 cascade_partial = partial(
     click.option,
@@ -130,12 +108,21 @@ flat_output = click.option(
     help="flattens output of `/deeply/nested/paths` as simply `path`",
 )
 
-no_cascade = click.option(
-    "--no-cascade",
+# no_cascade = click.option(
+#     "--no-cascade",
+#     required=False,
+#     default=False,
+#     flag=True,
+#     help="regex to filter results by",
+# )
+
+caller_context = click.option(
+    "--caller-context",
     required=False,
     default=False,
-    flag=True,
-    help="regex to filter results by",
+    show_default=True,
+    is_flag=True,
+    help="display details about caller-context",
 )
 
 filter = click.option(
@@ -151,56 +138,44 @@ optional_arn = click.option(
     default="",
     help="ARN",
 )
-optional_role_name = click.option(
-    "--role-name",
-    required=False,
-    default="",
-    help="Role name",
-)
 
-env_partial = partial(
+profile_partial = partial(
     click.option,
-    "--env",
+    "--profile",
     envvar="AWS_PROFILE",
-    help="Environment to use",
+    help="AWS profile to use",
 )
-src_env_partial = partial(
+src_profile_partial = partial(
     click.option,
-    "--src-env",
+    "--src-profile",
     help="Source Environment name",
+    show_default=True,
 )
-dest_env_partial = partial(
+dst_profile_partial = partial(
     click.option,
-    "--dest-env",
+    "--dest-profile",
     help="Destination Environment name",
+    show_default=True,
 )
 
-required_env = env_partial(
+required_profile = profile_partial(
     required=True,
 )
-optional_env = env_no_default = env_partial(
+optional_env = env_no_default = profile_partial(
     required=False,
 )
-env = default_env = env_partial(
+profile = default_profile = profile_partial(
     default="default",
     required=False,
 )
-src_env = src_env_default = src_env_partial(default="default", required=False)
-dest_env = dest_env_default = dest_env_partial(default="default", required=False)
-src_env_no_default = src_env_partial(default=None, required=False)
-dest_env_no_default = dest_env_partial(default=None, required=False)
-
-required_stack = click.option(
-    "--stack",
-    required=True,
-    help="Stack name to use",
+src_profile = src_profile_default = src_profile_partial(
+    default="default", required=False
 )
-
-required_key = click.option(
-    "--key",
-    required=True,
-    help="Key name to use",
+dst_profile = dst_profile_default = dst_profile_partial(
+    default="default", required=False
 )
+src_profile_no_default = src_profile_partial(default=None, required=False)
+dst_profile_no_default = dst_profile_partial(default=None, required=False)
 
 src_prefix = click.option(
     "--src-prefix",
