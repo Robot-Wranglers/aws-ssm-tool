@@ -10,13 +10,16 @@ set -xeuo pipefail
 python -m ssm --help
 ssm --help
 ssm put /tests/integration/ssm-tool/key1 value1
+ssm ls /tests/integration/ssm-tool/
+ssm ls /tests/
+ssm ls /tests/ --format json | jq .
+ssm ls /tests/ --format yaml
+ssm ls /tests/integration/ssm-tool --dirs-only
+ssm ls-dirs /tests/integration/ssm-tool 
 ssm copy /tests/integration/ssm-tool/key1 /tests/integration/ssm-tool/key2
 ssm stat /tests/ --format json | jq .
 ssm stat /tests/ --format json | jq .parameters.count
 ssm stat /tests/ --format json --caller-context | jq .context
-ssm ls /tests/
-ssm ls /tests/ --format json | jq .
-ssm ls /tests/ --format yaml
 ssm get /tests/integration/ssm-tool/key1
 ssm get-many /tests/integration/ssm-tool/ --format stdout
 ssm get-many /tests/integration/ssm-tool/ --flat-output --format yaml

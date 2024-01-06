@@ -98,7 +98,7 @@ class ApiWrapper(abcs.Loggable):
                 print("\n".join(acc))
             elif format in ["stdout"]:
                 if isinstance(result, (list,)):
-                    print("\n".join(result))
+                    print("\n".join([str(x) for x in result]))
                 elif isinstance(result, (dict,)):
                     tree = util.Tree(
                         "",

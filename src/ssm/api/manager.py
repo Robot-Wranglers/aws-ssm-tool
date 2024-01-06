@@ -25,6 +25,12 @@ class SecretManager(abcs.Loggable):
             ]["Value"]
         except self.env.ssm.exceptions.ParameterNotFound as exc:
             raise KeyError(name)
+        except botocore.exceptions.ClientError as exc:
+            self.env.logger.warning(f"Can't retrieve key `{name}`.")
+            self.env.logger.warning(
+                "Either it does not exist, or it is a hiearchy and not a leaf"
+            )
+            raise TypeError(name)
 
     def __delitem__(self, name):
         """ex: del secrets['foo']"""

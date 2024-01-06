@@ -38,8 +38,19 @@ list = ApiWrapper(
     aliases=["ls"],
     extra_options=[
         cli.options.profile,
-        cli.args.secret_name,
+        cli.options.dirs_only,
         cli.options.output_format_stdout_default,
+        click.argument("path_prefix", nargs=1, default="/"),
+    ],
+)
+
+list_dirs = ApiWrapper(
+    fxn=api.list_dirs,
+    aliases=["ls-dirs"],
+    extra_options=[
+        cli.options.profile,
+        cli.options.output_format_stdout_default,
+        click.argument("path_prefix", nargs=1, default="/"),
     ],
 )
 
@@ -59,7 +70,6 @@ read = ApiWrapper(
     aliases=["get"],
     extra_options=[
         cli.options.profile,
-        cli.options.cascade,
         cli.args.secret_name,
     ],
 )

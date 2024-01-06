@@ -29,9 +29,6 @@ output_format = format = output_format_partial(required=True)
 output_format_yaml_default = output_format_partial(required=False, default="yaml")
 output_format_json_default = output_format_partial(required=False, default="json")
 output_format_stdout_default = output_format_partial(required=False, default="stdout")
-required_dst_bucket = dst_bucket = click.option(
-    "--dest-bucket", envvar="DEST_BUCKET", help="dest bucket name", required=True
-)
 
 
 optional_user = user = click.option(
@@ -68,13 +65,13 @@ optional_prefix = click.option(
     "--prefix", help="src prefix to operate under", required=False, default=""
 )
 
-dst_prefix = click.option(
-    "--dest-prefix",
-    envvar="DEST_PREFIX",
-    help="dest prefix to operate under",
-    required=False,
-    default="",
-)
+# dst_prefix = click.option(
+#     "--dest-prefix",
+#     envvar="DEST_PREFIX",
+#     help="dest prefix to operate under",
+#     required=False,
+#     default="",
+# )
 
 command = click.option(
     "--command",
@@ -107,15 +104,13 @@ flat_output = click.option(
     default=False,
     help="flattens output of `/deeply/nested/paths` as simply `path`",
 )
-
-# no_cascade = click.option(
-#     "--no-cascade",
-#     required=False,
-#     default=False,
-#     flag=True,
-#     help="regex to filter results by",
-# )
-
+dirs_only = click.option(
+    "--dirs-only",
+    is_flag=True,
+    show_default=True,
+    default=False,
+    help="returns directories only",
+)
 caller_context = click.option(
     "--caller-context",
     required=False,
@@ -123,20 +118,6 @@ caller_context = click.option(
     show_default=True,
     is_flag=True,
     help="display details about caller-context",
-)
-
-filter = click.option(
-    "--filter",
-    required=False,
-    default=".*",
-    help="regex to filter results by",
-)
-
-optional_arn = click.option(
-    "--arn",
-    required=False,
-    default="",
-    help="ARN",
 )
 
 profile_partial = partial(
@@ -153,16 +134,13 @@ src_profile_partial = partial(
 )
 dst_profile_partial = partial(
     click.option,
-    "--dest-profile",
+    "--dst-profile",
     help="Destination Environment name",
     show_default=True,
 )
 
 required_profile = profile_partial(
     required=True,
-)
-optional_env = env_no_default = profile_partial(
-    required=False,
 )
 profile = default_profile = profile_partial(
     default="default",
@@ -183,10 +161,4 @@ src_prefix = click.option(
     help="src prefix to operate under",
     required=False,
     default="",
-)
-
-required_regexp = click.option(
-    "--regexp",
-    required=True,
-    help="RegExp to use",
 )
