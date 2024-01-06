@@ -1,6 +1,7 @@
-"""
-See the docs here:
-  https://github.com/elo-enterprises/aws-secrets
+""" ssm.bin.ssm
+
+  Command-line entry-points.  
+  (This file makes parts of `ssm.api` available via click)
 """
 
 
@@ -17,7 +18,8 @@ LOGGER = util.get_logger(__name__)
 @click.command(cls=cli.Group)
 def entry(*args, **kargs):  # noqa
     """
-    Tool for accessing secrets
+    SSM tool, a small helper for interacting with Amazon Simple Systems Manager
+    for secrets storage/retrieval.
     """
     # this could update global settings here
     # ctx = {}
@@ -37,6 +39,16 @@ list = ApiWrapper(
     extra_options=[
         cli.options.env,
         cli.args.secret_name,
+        cli.options.file_format_stdout_default,
+    ],
+)
+
+stat = ApiWrapper(
+    fxn=api.stat,
+    aliases=["st"],
+    extra_options=[
+        cli.options.env,
+        cli.options.file_format_stdout_default,
     ],
 )
 
@@ -78,6 +90,7 @@ move = ApiWrapper(
         click.argument("src_name", nargs=1),
     ],
 )
+
 move_many = ApiWrapper(
     fxn=api.move_many,
     aliases=["mv-many", "move-path", "mv-path"],
@@ -88,6 +101,7 @@ move_many = ApiWrapper(
         click.argument("src_name", nargs=1),
     ],
 )
+
 copy = ApiWrapper(
     fxn=api.copy,
     aliases=["cp"],
@@ -98,6 +112,7 @@ copy = ApiWrapper(
         click.argument("src_name", nargs=1),
     ],
 )
+
 update = ApiWrapper(
     fxn=api.update,
     aliases=["put", "set"],
@@ -108,16 +123,19 @@ update = ApiWrapper(
         cli.args.secret_name,
     ],
 )
+
 get_many = ApiWrapper(
     fxn=api.get_many,
     aliases=["get-path"],
     extra_options=[
         cli.options.env,
         cli.options.cascade,
-        cli.options.file_format,
+        cli.options.flat_output,
+        cli.options.file_format_yaml_default,
         cli.args.namespace,
     ],
 )
+
 put_many = ApiWrapper(
     fxn=api.put_many,
     aliases=["put-path"],

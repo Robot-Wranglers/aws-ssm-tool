@@ -5,6 +5,10 @@ import functools
 
 import termcolor
 import coloredlogs
+from rich.text import Text
+from rich.tree import Tree
+
+from rich import print as rich_print  # noqa
 
 blue = functools.partial(termcolor.colored, color="blue")
 red = functools.partial(termcolor.colored, color="red")
@@ -13,8 +17,33 @@ yellow = functools.partial(termcolor.colored, color="yellow")
 bold = functools.partial(termcolor.colored, attrs=["bold"])
 
 
-def is_string(obj):
+def rich_walk_dict(dct, tree: Tree, branch_color="[bold magenta]") -> None:
+    """recursively build rich.tree.Tree from dict contents"""
+    for k, v in dct.items():
+        if isinstance(v, (dict,)):
+            style = "dim"
+            branch = tree.add(
+                f"{branch_color}{k}",
+                style=style,
+                guide_style=style,
+            )
+            rich_walk_dict(v, branch)
+        else:
+            tree.add(Text(f"{k}", "green") + Text(": ") + Text(f"{v}"))
+
+
+def is_string(obj) -> bool:
+    """ """
     return isinstance(obj, str)
+
+
+def flatten_output(result: dict) -> dict:
+    """ """
+    acc = {}
+    for k, v in result.items():
+        tmp = k.split("/")
+        acc[tmp[-1]] = v
+    return acc
 
 
 def fatal_error(msg):
@@ -28,6 +57,10 @@ def get_logger(name):
     utility function for returning a logger
     with standard formatting patterns, etc
     """
+    import os
+
+    if os.path.exists(name):
+        name = name.replace(os.path.expanduser("~/"), "")
 
     class DuplicateFilter(logging.Filter):
         def filter(self, record):

@@ -14,7 +14,7 @@ class SecretManager(abcs.Loggable):
     def __init__(self, env=None, **kwargs):
         assert env is not None
         self.env = env
-        self.logger_name = f"{repr(self.env)}[Secrets]"
+        self.logger_name = f"<Secrets[{self.env.logger_name}]>"
         super().__init__(**kwargs)
 
     def __getitem__(self, name):
@@ -70,7 +70,7 @@ class SecretManager(abcs.Loggable):
 
     def under(self, path_prefix):
         """ """
-        self.logger.debug(f"looking up all SSM keys under {path_prefix}")
+        self.logger.debug(f"lookup: {path_prefix}")
         paginator = self.env.ssm.get_paginator("get_parameters_by_path")
         pages = paginator.paginate(
             Path=path_prefix, Recursive=True, WithDecryption=True
