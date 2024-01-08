@@ -22,7 +22,7 @@ output_format_partial = partial(
     click.option,
     "--format",
     show_default=True,
-    type=click.Choice(["json", "yaml", "yml", "env", "stdout", 'tree']),
+    type=click.Choice(["json", "yaml", "yml", "env", "stdout", "tree"]),
     help="output format",
 )
 output_format = format = output_format_partial(required=True)

@@ -39,6 +39,7 @@ list = ApiWrapper(
     extra_options=[
         cli.options.profile,
         cli.options.output_format_tree_default,
+        cli.options.dirs_only,
         click.argument("path_prefix", nargs=1, default="/"),
     ],
 )
