@@ -22,13 +22,14 @@ output_format_partial = partial(
     click.option,
     "--format",
     show_default=True,
-    type=click.Choice(["json", "yaml", "yml", "env", "stdout"]),
+    type=click.Choice(["json", "yaml", "yml", "env", "stdout", 'tree']),
     help="output format",
 )
 output_format = format = output_format_partial(required=True)
 output_format_yaml_default = output_format_partial(required=False, default="yaml")
 output_format_json_default = output_format_partial(required=False, default="json")
 output_format_stdout_default = output_format_partial(required=False, default="stdout")
+output_format_tree_default = output_format_partial(required=False, default="tree")
 
 
 optional_user = user = click.option(

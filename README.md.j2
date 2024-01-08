@@ -23,7 +23,7 @@
 
 ## Overview
 
-The [AWS SSM Parameter-Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) is great, but can be awkward to work with via the `awscli` tool.  This project provides the `ssm` tool as an alternative interface with simple CRUD.
+The [AWS SSM Parameter-Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) is great, but can be awkward to work with via the `awscli` tool.  This project provides the `ssm` tool as an alternative interface with simple CRUD.  It also supports moving or copying trees of multiple parameters, and performing those operations across multiple AWS profiles.
 
 See [setup.cfg](setup.cfg) to find the latest info about required versions of boto.  There are other dependencies, including the popular [click](#) library for CLI support and [rich](#) for pretty output.
 
@@ -70,9 +70,6 @@ Commands:
   read       get a secret
   stat       reports status, including account details and metadata...
   update     put a secret
-  cp         ALIAS for `copy`
-  get        ALIAS for `read`
-  get-path   ALIAS for `get-many`
   ls         ALIAS for `list`
   move-path  ALIAS for `move-many`
   mv         ALIAS for `move`
@@ -84,5 +81,7 @@ Commands:
   set        ALIAS for `update`
   st         ALIAS for `stat`
 ```
+
+See [the integration tests](tests/integration/test.sh) for more examples.
 
 ---------------------------------------------------------------------------------
