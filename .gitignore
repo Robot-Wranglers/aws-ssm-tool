@@ -127,7 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-src/pynchon/_version.py
+src/*/_version.py
 .DS_Store
 
 # Ignore dynaconf secret files

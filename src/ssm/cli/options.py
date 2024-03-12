@@ -41,14 +41,6 @@ optional_user = user = click.option(
 optional_users = users = click.option(
     "--users", help="user list (comma-separatted)", required=False, default=""
 )
-optional_database = database = click.option(
-    "--database",
-    help="database (default will attempt auto-detect)",
-    required=False,
-    default="",
-)
-
-required_bucket = click.option("--bucket", help="bucket name", required=True)
 
 raw = click.option(
     "--raw", "-r", help="unquotes text return values (like jq -r)", default=False
@@ -64,28 +56,6 @@ pause_or_nowait = no_wait = pause = click.option(
 
 optional_prefix = click.option(
     "--prefix", help="src prefix to operate under", required=False, default=""
-)
-
-# dst_prefix = click.option(
-#     "--dest-prefix",
-#     envvar="DEST_PREFIX",
-#     help="dest prefix to operate under",
-#     required=False,
-#     default="",
-# )
-
-command = click.option(
-    "--command",
-    "-c",
-    required=False,
-    default="",
-    help="Command to run (like bash -c)",
-)
-required_command = click.option(
-    "--command",
-    "-c",
-    default="",
-    help="Command to run (like bash -c)",
 )
 
 cascade_partial = partial(

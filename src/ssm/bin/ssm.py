@@ -4,7 +4,6 @@
   (This file makes parts of `ssm.api` available via click)
 """
 
-
 import functools
 
 import click

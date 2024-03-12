@@ -1,0 +1,192 @@
+{ // BEGIN: top-level pynchon config
+  // Everything here is optional.
+  // Literals only; no templating please!
+  "plugins": [
+    // defaults; these are included anyway
+    'globals', 'render', 'gen', 'project', 'plugins',
+    'jinja', 'git', 'core', 'python', 
+    'tests',
+
+    // Recommended for projects with source-code
+    "docs", "src", "github",
+
+    // Standard if there's a python-project
+    "pypi", "python-api", "python-cli", "python-libcst",
+
+    // For projects with intermediate representations
+    "dot",   // graphviz dot-files
+    "jinja", // projects with templated docs
+    "mermaid",   // mermaid cli
+
+    // Experimental
+    // "griffe",    // ast tool
+  ],
+  // END: top-level config
+  // BEGIN: core plugins-config
+  "python-libcst":{
+    // .libcst.codemod.yaml file:
+    // leave this empty to use a static one
+    // that's already present.  fill it in
+    // to have it recreated when needed and
+    // use pynchon's context for templating it
+    ".libcst.codemod.yaml": {
+      "repo_root": "{{src.root}}",
+      "generated_code_marker": '@generated',
+      "formatter": ['black', '-'],
+      "blacklist_patterns": [],
+      "modules": [
+        'libcst.codemod.commands',
+        'pynchon.codemod.commands',
+      ],
+    },
+    // "apply_hooks": ["display-modified"],
+
+
+  },
+  // Config for `globals` plugin: (priority=..)
+  //   All well-behaved plugins will honor values here, appending
+  //   these values to whatever is set explicitly for that plugin
+  "globals": {
+    "exclude_patterns": [
+      ".*[.]pyc",
+      ".*_version[.]py",
+      "**/tests/fixtures/**",
+      "**/build/lib/**",
+      "**/*.egg-info/**",      
+    ],
+  },
+
+  // Config for `src` plugin:
+  //   This provides find/search tooling, plus file-header generators, etc
+  "src": {
+    "root": "{{pynchon.root}}/src",
+    "exclude_patterns": [
+      "**/pynchon/templates/scaffolds/**",
+    ],
+
+    "include_patterns": [
+        "{{src.root}}/**/*.py",
+        "{{src.root}}/**/*.j2",
+      ],
+    "headers": {},
+    "goals": [
+      // ...
+    ],
+  },
+
+  // Config for `tests` plugin:
+  //   ...
+  "tests": {
+    "root": "{{pynchon.root}}/tests",
+    "include_patterns": ["**/*.py",],
+    "suite_patterns": ["*/",],
+  },
+
+  // Config for `docs` plugin:
+  //   Runs a webserver to open docs-files
+  "docs": {
+    "root": "{{pynchon.root}}/docs",
+    "include_patterns": [
+        "{{pynchon.root}}/*.md",
+        "{{docs.root}}/**/*.md",
+        "{{docs.root}}/**/*.html",
+      ],
+      "apply_hooks": [],
+  },
+// Config for `project` plugin:
+  "project":{
+    "subproject_patterns": [],
+  },
+
+  // END: core plugins-config
+  // BEGIN: other plugins-config
+
+    // Config for `github` plugin:
+  "github": {},
+
+  // Config for `hooks` plugin:
+   "hooks": {},
+
+
+  // Config for `jinja` plugin:
+  // Planner for finding/rendering project .j2 files
+  "jinja":{
+    "context_vars": {
+      // extra context-vars passed for renders
+       // allows {tpls|json}
+     },
+
+    "filter_includes": [
+      // where to load jinja filters from
+      // allows {tpls|paths|globs}
+    ],
+
+   "exclude_patterns": [
+     // Describes files that shouldn't show up in plans
+     // `globals.exclude_patterns` will be appended.
+     "**/pynchon/templates/**",
+   ],
+
+   "template_includes": [
+     // Paths to load includes from.
+     // (Used in templates as `{% include .. %}`)
+     "{{docs.root}}/includes",
+   ],
+ },
+
+  // Config for `fixme` plugin:
+  // `globals.exclude_patterns` will be appended.
+  "fixme": {
+    "exclude_patterns": [
+      "{{src.root}}/**/fixme/**",
+      "{{src.root}}/**/fixme.py",
+      "{{src.root}}/**/python/api/**",
+      "{{src.root}}/pynchon/annotate.py",
+    ],
+  },
+  // Config for `python-api` plugin:
+  // This generates API docs for python-packages
+  "python":{},
+  // Config for `python-api` plugin:
+  // This generates API docs for python-packages
+  "python-api":{
+    "skip_private_methods": true,
+    "skip_patterns": [],
+  },
+
+  // Config for `scaffolding` plugin:
+  // This provides ways to synchronize/diff project boilerplate.
+  // (Similar to cookie-cutter[], but more simple to use.)
+  "scaffolding":{
+    "exclude_patterns": [
+      // includes globals
+    ],
+    "scaffolds":[
+      // list of Scaffolds-objects
+      {
+        "name": "subproject tox.ini's",
+        "pattern": "**/tox.ini",
+        "scope":"*",
+        "src":"pyproject.toml",
+       },
+     ],
+   },
+
+   // Config for `pypi` plugin:
+  // Provider for details about the PyPI this project uses.
+  // (This is only used in rendering docs; `pynchon` does not manage releases.
+  // You can probably leave this blank for public PyPI but pynchon's own
+  // config has some values just1to ensure the plugin is exercised.)
+  "pypi": {
+    "name":"THE public PyPI"
+  },
+
+  // Config for `cicd` plugin:
+  // Provider for details about the build server for this project.
+  // (This is only used in rendering docs; `pynchon` does not manage builds.)
+  "cicd": {
+    // "url_base": "",
+    // "url_build": "",
+    "url_deploy": "OVERRIDE",
+  },
+}
