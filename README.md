@@ -10,9 +10,9 @@
     <td>
     SSM tool is a small helper for interacting with Amazon Simple Systems Manager, focusing on secrets storage/retrieval.
     <br/><br/>
-    <a href=https://pypi.python.org/pypi/aws-ssm-tool/><img src="https://img.shields.io/pypi/l/ssm-tool.svg"></a>
-    <a href=https://pypi.python.org/pypi/aws-ssm-tool/><img src="https://badge.fury.io/py/ssm-tool.svg"></a>
-    <a href="https://github.com/Robot-Wranglers/aws-ssm-tool/actions/workflows/python-test.yml"><img src="https://github.com/Robot-Wranglers/aws-ssm-tool/actions/workflows/python-test.yml/badge.svg"></a>
+    <a href=https://pypi.python.org/pypi/aws-ssm-tool/><img src="https://img.shields.io/pypi/l/aws-ssm-tool.svg"></a>
+    <a href=https://pypi.python.org/pypi/aws-ssm-tool/><img src="https://badge.fury.io/py/aws-ssm-tool.svg"></a>
+    <a href="https://github.com/https://github.com/Robot-Wranglers/ssm-tool/actions/workflows/python-test.yml"><img src="https://github.com/https://github.com/Robot-Wranglers/ssm-tool/actions/workflows/python-test.yml/badge.svg"></a>
     </td>
   </tr>
 </table>
@@ -91,6 +91,6 @@ Commands:
   st         ALIAS for `stat`
 ```
 
-See [the integration tests](tests/integration/test.sh) for more examples.
+See [the integration tests](https://github.com/Robot-Wranglers/ssm-tool/tree/master/tests/integration/test.sh) for more examples.
 
 ---------------------------------------------------------------------------------
