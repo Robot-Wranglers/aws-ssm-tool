@@ -45,8 +45,8 @@
 -------------------------------------------------------------------------------
 ### ssm.cli.options
 * **Overview:**  [source code](/src/ssm/cli/options.py), [unit tests](/tests/units/), [integration tests](/tests/integrations/)
-* **Names:** (34 total)::
-  *  *partial*, *click*, *key*, *top*, *existing_file*, *filter_service_partial*, *filter_service*, *output_format_partial*, *output_format*, *format*, *output_format_yaml_default*, *output_format_stdout_default*, *output_format_tree_default*, *optional_user*, *user*, *optional_users*, *users*, *raw*, *optional_prefix*, *cascade_partial*, *cascade*, *no_cascade*, *flat_output*, *dirs_only*, *caller_context*, *profile_partial*, *src_profile_partial*, *dst_profile_partial*, *profile*, *default_profile*, *src_profile*, *src_profile_default*, *dst_profile*, *dst_profile_default*
+* **Names:** (29 total)::
+  *  *partial*, *click*, *key*, *top*, *existing_file*, *filter_service_partial*, *filter_service*, *output_format_partial*, *output_format*, *format*, *output_format_yaml_default*, *output_format_stdout_default*, *output_format_tree_default*, *raw*, *optional_prefix*, *cascade_partial*, *cascade*, *no_cascade*, *flat_output*, *dirs_only*, *caller_context*, *profile_partial*, *src_profile_partial*, *dst_profile_partial*, *profile*, *src_profile*, *src_profile_default*, *dst_profile*, *dst_profile_default*
 -------------------------------------------------------------------------------
 ### ssm.cli.wrapper
 * **Overview:**  [source code](/src/ssm/cli/wrapper.py), [unit tests](/tests/units/), [integration tests](/tests/integrations/)
