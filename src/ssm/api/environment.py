@@ -115,20 +115,9 @@ class Environment(
         self.session = boto3.session.Session(
             profile_name=self.profile_name, region_name=self.region_name
         )
-        self.s3 = self.session.client("s3")
-        self.ec2 = self.session.client("ec2")
-        self.emr = self.session.client("emr")
         self.ssm = self.session.client("ssm")
         self.iam = self.session.client("iam")
         self.sts = self.session.client("sts")
-        self.cloudwatch = self.session.client("cloudwatch")
-        self.route53 = self.session.client("route53")
-        # always us-east-1
-        self.support = boto3.session.Session(
-            profile_name=self.profile_name, region_name="us-east-1"
-        ).client("support")
-        self.redshift = self.session.client("redshift")
-        self.cloudformation = self.session.client("cloudformation")
 
     @property
     def user_names(self):

@@ -10,16 +10,22 @@
     <td>
     SSM tool is a small helper for interacting with Amazon Simple Systems Manager, focusing on secrets storage/retrieval.
     <br/><br/>
-    <a href=https://pypi.python.org/pypi/ssm-tool/><img src="https://img.shields.io/pypi/l/ssm-tool.svg"></a>
-    <a href=https://pypi.python.org/pypi/ssm-tool/><img src="https://badge.fury.io/py/ssm-tool.svg"></a>
+    <a href=https://pypi.python.org/pypi/aws-ssm-tool/><img src="https://img.shields.io/pypi/l/ssm-tool.svg"></a>
+    <a href=https://pypi.python.org/pypi/aws-ssm-tool/><img src="https://badge.fury.io/py/ssm-tool.svg"></a>
     <a href="https://github.com/elo-enterprises/ssm-tool/actions/workflows/python-test.yml"><img src="https://github.com/elo-enterprises/ssm-tool/actions/workflows/python-test.yml/badge.svg"></a>
     </td>
   </tr>
 </table>
 
-  * [Overview](#overview)
-  * [Installation](#installation)
-  * [Usage](#usage)
+---------------------------------------------------------------------------------
+
+<div class="toc">
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#usage">Usage</a></li>
+</ul>
+</div>
 
 
 ---------------------------------------------------------------------------------

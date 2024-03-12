@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
-# NB: integration tests are run via `make integration-test`, 
-# or equivalently, `make itest` or `tox -e itest`.
-#
 # NB: unlike smoke-tests, these integration tests do NOT run 
 # from github actions.  you can put tests here that require a profile
+#
+# NB: integration tests are run via `make integration-test`, 
+# or equivalently, `make itest` or `tox -e itest`.
 #
 set -xeuo pipefail
 python -m ssm --help
