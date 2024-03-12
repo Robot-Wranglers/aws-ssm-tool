@@ -27,7 +27,7 @@ output_format_partial = partial(
 )
 output_format = format = output_format_partial(required=True)
 output_format_yaml_default = output_format_partial(required=False, default="yaml")
-output_format_json_default = output_format_partial(required=False, default="json")
+# output_format_json_default = output_format_partial(required=False, default="json")
 output_format_stdout_default = output_format_partial(required=False, default="stdout")
 output_format_tree_default = output_format_partial(required=False, default="tree")
 
@@ -46,13 +46,9 @@ raw = click.option(
     "--raw", "-r", help="unquotes text return values (like jq -r)", default=False
 )
 
-force_or_dry = force = dry_run = click.option(
-    "--force/--dry-run", "-f/-d", help="perform actions", default=False, envvar="FORCE"
-)
-
-pause_or_nowait = no_wait = pause = click.option(
-    "--pause/--no-wait", help="pause before starting", default=True
-)
+# force_or_dry = force = dry_run = click.option(
+#     "--force/--dry-run", "-f/-d", help="perform actions", default=False, envvar="FORCE"
+# )
 
 optional_prefix = click.option(
     "--prefix", help="src prefix to operate under", required=False, default=""
@@ -110,9 +106,9 @@ dst_profile_partial = partial(
     show_default=True,
 )
 
-required_profile = profile_partial(
-    required=True,
-)
+# required_profile = profile_partial(
+#     required=True,
+# )
 profile = default_profile = profile_partial(
     default="default",
     required=False,
@@ -123,13 +119,13 @@ src_profile = src_profile_default = src_profile_partial(
 dst_profile = dst_profile_default = dst_profile_partial(
     default="default", required=False
 )
-src_profile_no_default = src_profile_partial(default=None, required=False)
-dst_profile_no_default = dst_profile_partial(default=None, required=False)
+# src_profile_no_default = src_profile_partial(default=None, required=False)
+# dst_profile_no_default = dst_profile_partial(default=None, required=False)
 
-src_prefix = click.option(
-    "--src-prefix",
-    envvar="SRC_PREFIX",
-    help="src prefix to operate under",
-    required=False,
-    default="",
-)
+# src_prefix = click.option(
+#     "--src-prefix",
+#     envvar="SRC_PREFIX",
+#     help="src prefix to operate under",
+#     required=False,
+#     default="",
+# )

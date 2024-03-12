@@ -20,11 +20,11 @@
 ### ssm.util
 * **Overview:**  [source code](/src/ssm/util/__init__.py), [unit tests](/tests/units/), [integration tests](/tests/integrations/)
 * **Functions:** (5 total)
-  * [`ssm.util.fatal_error`](/src/ssm/util/__init__.py#L49-L52) with signature `(msg)`
-  * [`ssm.util.flatten_output`](/src/ssm/util/__init__.py#L40-L46) with signature `(result: dict) -> dict`
-  * [`ssm.util.get_logger`](/src/ssm/util/__init__.py#L55-L94) with signature `(name)`
-  * [`ssm.util.is_string`](/src/ssm/util/__init__.py#L35-L37) with signature `(obj) -> bool`
-  * [`ssm.util.rich_walk_dict`](/src/ssm/util/__init__.py#L20-L32)
+  * [`ssm.util.fatal_error`](/src/ssm/util/__init__.py#L50-L53) with signature `(msg)`
+  * [`ssm.util.flatten_output`](/src/ssm/util/__init__.py#L41-L47) with signature `(result: dict) -> dict`
+  * [`ssm.util.get_logger`](/src/ssm/util/__init__.py#L56-L95) with signature `(name)`
+  * [`ssm.util.is_string`](/src/ssm/util/__init__.py#L36-L38) with signature `(obj) -> bool`
+  * [`ssm.util.rich_walk_dict`](/src/ssm/util/__init__.py#L21-L33)
     * with signature `(dct, tree: rich.tree.Tree, branch_color='[bold magenta]') -> None`
 -------------------------------------------------------------------------------
 ### ssm.bin
@@ -35,7 +35,7 @@
 ### ssm.bin.ssm
 * **Overview:**  [source code](/src/ssm/bin/ssm.py), [unit tests](/tests/units/), [integration tests](/tests/integrations/)
 * **Functions:** (1 total)
-  * [`ssm.bin.ssm.entry`](/src/ssm/bin/ssm.py#L18-L23) with signature `(*args: Any, **kwargs: Any) -> Any`
+  * [`ssm.bin.ssm.entry`](/src/ssm/bin/ssm.py#L17-L22) with signature `(*args: Any, **kwargs: Any) -> Any`
 -------------------------------------------------------------------------------
 ### ssm.cli
 * **Overview:**  [source code](/src/ssm/cli/__init__.py), [unit tests](/tests/units/), [integration tests](/tests/integrations/)
@@ -45,8 +45,8 @@
 -------------------------------------------------------------------------------
 ### ssm.cli.options
 * **Overview:**  [source code](/src/ssm/cli/options.py), [unit tests](/tests/units/), [integration tests](/tests/integrations/)
-* **Names:** (45 total)::
-  *  *partial*, *click*, *key*, *top*, *existing_file*, *filter_service_partial*, *filter_service*, *output_format_partial*, *output_format*, *format*, *output_format_yaml_default*, *output_format_json_default*, *output_format_stdout_default*, *output_format_tree_default*, *optional_user*, *user*, *optional_users*, *users*, *raw*, *force_or_dry*, *force*, *dry_run*, *pause_or_nowait*, *no_wait*, *pause*, *optional_prefix*, *cascade_partial*, *cascade*, *no_cascade*, *flat_output*, *dirs_only*, *caller_context*, *profile_partial*, *src_profile_partial*, *dst_profile_partial*, *required_profile*, *profile*, *default_profile*, *src_profile*, *src_profile_default*, *dst_profile*, *dst_profile_default*, *src_profile_no_default*, *dst_profile_no_default*, *src_prefix*
+* **Names:** (34 total)::
+  *  *partial*, *click*, *key*, *top*, *existing_file*, *filter_service_partial*, *filter_service*, *output_format_partial*, *output_format*, *format*, *output_format_yaml_default*, *output_format_stdout_default*, *output_format_tree_default*, *optional_user*, *user*, *optional_users*, *users*, *raw*, *optional_prefix*, *cascade_partial*, *cascade*, *no_cascade*, *flat_output*, *dirs_only*, *caller_context*, *profile_partial*, *src_profile_partial*, *dst_profile_partial*, *profile*, *default_profile*, *src_profile*, *src_profile_default*, *dst_profile*, *dst_profile_default*
 -------------------------------------------------------------------------------
 ### ssm.cli.wrapper
 * **Overview:**  [source code](/src/ssm/cli/wrapper.py), [unit tests](/tests/units/), [integration tests](/tests/integrations/)
@@ -57,8 +57,8 @@
 -------------------------------------------------------------------------------
 ### ssm.cli.args
 * **Overview:**  [source code](/src/ssm/cli/args.py), [unit tests](/tests/units/), [integration tests](/tests/integrations/)
-* **Names:** (5 total)::
-  *  *click*, *secret_name*, *path_prefix*, *namespace*, *path_prefix_default*
+* **Names:** (4 total)::
+  *  *click*, *secret_name*, *path_prefix*, *namespace*
 -------------------------------------------------------------------------------
 ### ssm.api
 * **Overview:**  [source code](/src/ssm/api/__init__.py), [unit tests](/tests/units/), [integration tests](/tests/integrations/)
@@ -84,7 +84,7 @@
 ### ssm.api.environment
 * **Overview:**  [source code](/src/ssm/api/environment.py), [unit tests](/tests/units/), [integration tests](/tests/integrations/)
 * **Classes:** (1 total)
-  * [`ssm.api.environment.Environment`](/src/ssm/api/environment.py#L21-L179)
+  * [`ssm.api.environment.Environment`](/src/ssm/api/environment.py#L21-L168)
     * with bases ([Loggable](#ssmabcsloggable),)
     * with properties: (11 total)
       *  [`account_alias`](/src/ssm/api/environment.py#L62) -> inspect._empty
@@ -95,9 +95,9 @@
       *  [`profile_name`](/src/ssm/api/environment.py#L47) -> inspect._empty
       *  [`region`](/src/ssm/api/environment.py#L75) -> inspect._empty
       *  [`region_name`](/src/ssm/api/environment.py#L75) -> inspect._empty
-      *  [`role_names`](/src/ssm/api/environment.py#L139) -> inspect._empty
-      *  [`secrets`](/src/ssm/api/environment.py#L173) -> inspect._empty
-      *  [`user_names`](/src/ssm/api/environment.py#L133) -> inspect._empty
+      *  [`role_names`](/src/ssm/api/environment.py#L128) -> inspect._empty
+      *  [`secrets`](/src/ssm/api/environment.py#L162) -> inspect._empty
+      *  [`user_names`](/src/ssm/api/environment.py#L122) -> inspect._empty
 -------------------------------------------------------------------------------
 ### ssm.api.manager
 * **Overview:**  [source code](/src/ssm/api/manager.py), [unit tests](/tests/units/), [integration tests](/tests/integrations/)
