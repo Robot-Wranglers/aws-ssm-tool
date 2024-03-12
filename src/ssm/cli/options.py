@@ -7,14 +7,6 @@ from functools import partial
 
 import click
 
-cluster = click.option(
-    "--cluster",
-    required=False,
-    default="",
-    help="cluster to use (defaults to autodetection from env)",
-)
-comment = click.option("--comment", help="comment or description", required=False)
-container = click.option("--container", help="container to enter", required=False)
 key = click.option("--key", help="key to use", default="", required=False)
 
 top = click.option(
@@ -26,20 +18,18 @@ filter_service_partial = partial(
 )
 filter_service = filter_service_partial(default=".*")
 
-file_format_partial = partial(
+output_format_partial = partial(
     click.option,
     "--format",
     show_default=True,
-    type=click.Choice(["json", "yaml", "yml", "env", "stdout"]),
-    help="file format",
+    type=click.Choice(["json", "yaml", "yml", "env", "stdout", "tree"]),
+    help="output format",
 )
-file_format = format = file_format_partial(required=True)
-file_format_yaml_default = file_format_partial(required=False, default="yaml")
-file_format_json_default = file_format_partial(required=False, default="json")
-file_format_stdout_default = file_format_partial(required=False, default="stdout")
-required_dest_bucket = dest_bucket = click.option(
-    "--dest-bucket", envvar="DEST_BUCKET", help="dest bucket name", required=True
-)
+output_format = format = output_format_partial(required=True)
+output_format_yaml_default = output_format_partial(required=False, default="yaml")
+output_format_json_default = output_format_partial(required=False, default="json")
+output_format_stdout_default = output_format_partial(required=False, default="stdout")
+output_format_tree_default = output_format_partial(required=False, default="tree")
 
 
 optional_user = user = click.option(
@@ -51,14 +41,6 @@ optional_user = user = click.option(
 optional_users = users = click.option(
     "--users", help="user list (comma-separatted)", required=False, default=""
 )
-optional_database = database = click.option(
-    "--database",
-    help="database (default will attempt auto-detect)",
-    required=False,
-    default="",
-)
-
-required_bucket = click.option("--bucket", help="bucket name", required=True)
 
 raw = click.option(
     "--raw", "-r", help="unquotes text return values (like jq -r)", default=False
@@ -75,42 +57,6 @@ pause_or_nowait = no_wait = pause = click.option(
 optional_prefix = click.option(
     "--prefix", help="src prefix to operate under", required=False, default=""
 )
-
-dest_prefix = click.option(
-    "--dest-prefix",
-    envvar="DEST_PREFIX",
-    help="dest prefix to operate under",
-    required=False,
-    default="",
-)
-
-required_user = click.option(
-    "--user", help="username to use", required=True, default=""
-)
-
-optional_src_bucket = click.option(
-    "--src-bucket", envvar="SRC_BUCKET", help="src bucket name", required=False
-)
-
-required_src_bucket = click.option(
-    "--src-bucket", envvar="SRC_BUCKET", help="src bucket name", required=True
-)
-
-command = click.option(
-    "--command",
-    "-c",
-    required=False,
-    default="",
-    help="Command to run (like bash -c)",
-)
-required_command = click.option(
-    "--command",
-    "-c",
-    default="",
-    help="Command to run (like bash -c)",
-)
-
-script = click.option("--script", "-s", help="Script to run", default="")
 
 cascade_partial = partial(
     click.option,
@@ -129,78 +75,56 @@ flat_output = click.option(
     default=False,
     help="flattens output of `/deeply/nested/paths` as simply `path`",
 )
-
-no_cascade = click.option(
-    "--no-cascade",
+dirs_only = click.option(
+    "--dirs-only",
+    is_flag=True,
+    show_default=True,
+    default=False,
+    help="returns directories only",
+)
+caller_context = click.option(
+    "--caller-context",
     required=False,
     default=False,
-    flag=True,
-    help="regex to filter results by",
+    show_default=True,
+    is_flag=True,
+    help="display details about caller-context",
 )
 
-filter = click.option(
-    "--filter",
-    required=False,
-    default=".*",
-    help="regex to filter results by",
-)
-
-optional_arn = click.option(
-    "--arn",
-    required=False,
-    default="",
-    help="ARN",
-)
-optional_role_name = click.option(
-    "--role-name",
-    required=False,
-    default="",
-    help="Role name",
-)
-
-env_partial = partial(
+profile_partial = partial(
     click.option,
-    "--env",
+    "--profile",
     envvar="AWS_PROFILE",
-    help="Environment to use",
+    help="AWS profile to use",
 )
-src_env_partial = partial(
+src_profile_partial = partial(
     click.option,
-    "--src-env",
+    "--src-profile",
     help="Source Environment name",
+    show_default=True,
 )
-dest_env_partial = partial(
+dst_profile_partial = partial(
     click.option,
-    "--dest-env",
+    "--dst-profile",
     help="Destination Environment name",
+    show_default=True,
 )
 
-required_env = env_partial(
+required_profile = profile_partial(
     required=True,
 )
-optional_env = env_no_default = env_partial(
-    required=False,
-)
-env = default_env = env_partial(
+profile = default_profile = profile_partial(
     default="default",
     required=False,
 )
-src_env = src_env_default = src_env_partial(default="default", required=False)
-dest_env = dest_env_default = dest_env_partial(default="default", required=False)
-src_env_no_default = src_env_partial(default=None, required=False)
-dest_env_no_default = dest_env_partial(default=None, required=False)
-
-required_stack = click.option(
-    "--stack",
-    required=True,
-    help="Stack name to use",
+src_profile = src_profile_default = src_profile_partial(
+    default="default", required=False
 )
-
-required_key = click.option(
-    "--key",
-    required=True,
-    help="Key name to use",
+dst_profile = dst_profile_default = dst_profile_partial(
+    default="default", required=False
 )
+src_profile_no_default = src_profile_partial(default=None, required=False)
+dst_profile_no_default = dst_profile_partial(default=None, required=False)
 
 src_prefix = click.option(
     "--src-prefix",
@@ -208,10 +132,4 @@ src_prefix = click.option(
     help="src prefix to operate under",
     required=False,
     default="",
-)
-
-required_regexp = click.option(
-    "--regexp",
-    required=True,
-    help="RegExp to use",
 )

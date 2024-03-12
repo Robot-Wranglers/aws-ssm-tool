@@ -96,9 +96,15 @@ class ApiWrapper(abcs.Loggable):
                     tmp = "=".join([k.split("/")[-1], v])
                     acc.append(tmp)
                 print("\n".join(acc))
-            elif format in ["stdout"]:
-                if isinstance(result, (list,)):
-                    print("\n".join(result))
+            elif format in ["stdout", "tree"]:
+                if isinstance(result, (type([]),)):
+                    # if format=='tree':
+                    #     tree={}
+                    #     for path_prefix in result:
+                    #         for comp in path_prefix.split('/'):
+                    #             tree[path_prefix]=
+                    # else:
+                    print("\n".join([str(x) for x in result]))
                 elif isinstance(result, (dict,)):
                     tree = util.Tree(
                         "",

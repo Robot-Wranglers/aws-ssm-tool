@@ -1,18 +1,14 @@
-<!--- This is a markdown file.  Comments look like this --->
-
 <table width=100%>
   <tr>
     <td colspan=2><strong>
     aws-ssm-tool
       </strong>&nbsp;&nbsp;&nbsp;&nbsp;
-      <small><small>
-      </small></small>
     </td>
   </tr>
   <tr>
     <td width=15%><img src=img/icon.png style="width:150px"></td>
     <td>
-    Helper for interacting with SSM
+    SSM tool is a small helper for interacting with Amazon Simple Systems Manager, focusing on secrets storage/retrieval.
     <br/><br/>
     <a href=https://pypi.python.org/pypi/ssm-tool/><img src="https://img.shields.io/pypi/l/ssm-tool.svg"></a>
     <a href=https://pypi.python.org/pypi/ssm-tool/><img src="https://badge.fury.io/py/ssm-tool.svg"></a>
@@ -30,11 +26,11 @@
 
 ## Overview
 
-The [AWS SSM Parameter-Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) is great, but can be awkward to work with via the `awscli` tool.  This project provides the `ssm` tool as an alternative interface with simple CRUD.
+The [AWS SSM Parameter-Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) is great, but can be awkward to work with via the `awscli` tool.  This project provides the `ssm` tool as an alternative interface with simple CRUD.  It also supports moving or copying trees of multiple parameters, and performing those operations across multiple AWS profiles.
 
-See [setup.cfg](setup.cfg) to find the latest info about required versions of boto.
+See [setup.cfg](setup.cfg) to find the latest info about required versions of boto.  There are other dependencies, including the popular [click](#) library for CLI support and [rich](#) for pretty output.
 
-See the [Usage section](#usage) for more details
+See the [Usage section](#usage) for more details.
 
 ---------------------------------------------------------------------------------
 
@@ -54,12 +50,14 @@ After installation, you can invoke this tool as either `ssm` or `python -m ssm`.
 
 Usage info follows:
 
-```
+```bash
+
 $ ssm --help
 
 Usage: ssm [OPTIONS] COMMAND [ARGS]...
 
-  Tool for accessing secrets
+  SSM tool, a small helper for interacting with Amazon Simple Systems Manager
+  for secrets storage/retrieval.
 
 Options:
   --help  Show this message and exit.
@@ -67,16 +65,14 @@ Options:
 Commands:
   copy       copy a secret
   delete     delete secret (keeping a local-backup is default)
-  get-many   get many secrets from hierarchy/namespace
-  list       list prefixes below the given path
+  get-many   get many secrets from specified hierarchy/namespace
+  list       list parameters with prefixes below the given path
   move       move a secret
   move-many  move a whole path of secrets
   put-many   put many secrets
   read       get a secret
+  stat       reports status, including account details and metadata...
   update     put a secret
-  cp         ALIAS for `copy`
-  get        ALIAS for `read`
-  get-path   ALIAS for `get-many`
   ls         ALIAS for `list`
   move-path  ALIAS for `move-many`
   mv         ALIAS for `move`
@@ -86,6 +82,9 @@ Commands:
   put-path   ALIAS for `put-many`
   rm         ALIAS for `delete`
   set        ALIAS for `update`
+  st         ALIAS for `stat`
 ```
+
+See [the integration tests](tests/integration/test.sh) for more examples.
 
 ---------------------------------------------------------------------------------

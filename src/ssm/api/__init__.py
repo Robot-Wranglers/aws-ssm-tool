@@ -14,25 +14,28 @@ from ssm.api.environment import Environment
 LOGGER = util.get_logger(__name__)
 
 
-def _get_env(env=None, **kwargs):
-    """ """
-    env = Environment.from_profile(env) if util.is_string(env) else env
-    env.logger.info("getting client")
+def _get_env(profile=None, env=None, **kwargs):
+    """gets environment from environment or named profile"""
+    assert profile or env, str(kwargs)
+    env = Environment.from_profile(profile) if profile else env
     assert env
     return env
 
 
-def _get_handle(**kwargs):
-    """ """
-    return _get_env(**kwargs).secrets
+def _get_client(**kwargs):
+    """gets handle for the secrets-manager"""
+    env = _get_env(**kwargs)
+    env.logger.info("getting client")
+    sman = env.secrets
+    return sman
 
 
 def read(secret_name, **kwargs):
     """
-    get a secret
+    reads a secret
     """
     assert secret_name, f"cannot read secret_name `{secret_name}`"
-    secrets = _get_handle(**kwargs)
+    secrets = _get_client(**kwargs)
     try:
         return secrets[secret_name]
     except KeyError as exc:
@@ -40,48 +43,72 @@ def read(secret_name, **kwargs):
         raise SystemExit(1)
 
 
-def stat(path="/", **kwargs):
+def stat(path_prefix="/", caller_context: bool = True, **kwargs):
     """
     reports status, including account details and metadata summary for SSM parameters.
     """
     env = _get_env(**kwargs)
     caller_id = env.caller_id
     result = collections.OrderedDict()
-    result.update(
-        context=dict(
-            user=dict(
-                id=caller_id.get("UserId"),
-                arn=caller_id.get("Arn"),
-            ),
-            account=dict(
-                profile_name=env.profile_name,
-                id=env.account_id,
-                alias=env.account_alias,
-                region_name=env.region_name,
-            ),
+    if caller_context:
+        LOGGER.info("lookup caller-context")
+        result.update(
+            context=dict(
+                user=dict(
+                    id=caller_id.get("UserId"),
+                    arn=caller_id.get("Arn"),
+                ),
+                account=dict(
+                    profile_name=env.profile_name,
+                    id=env.account_id,
+                    alias=env.account_alias,
+                    region_name=env.region_name,
+                ),
+            )
         )
+    result.update(
+        parameters=dict(
+            root=path_prefix,
+            key_count=len(env.secrets.under(path_prefix)),
+            children=env.secrets.children(path_prefix),
+        ),
     )
-    result.update(parameters=dict(root=path, count=len(env.secrets.under("/"))))
     return result
 
 
-def list(secret_name, **kwargs):
+import typing
+
+
+def list_dirs(path_prefix, **kwargs) -> typing.List:
     """
-    list parameters with prefixes below the given path
+    lists subpaths (i.e. directories) under the given path.
+    no leaf nodes are returned
     """
-    # WARNING: do not use `list()` here..
-    secrets = _get_handle(**kwargs)
-    result = secrets.under(secret_name).keys()
+    kwargs.update(dirs_only=True)
+    return list(path_prefix, **kwargs)
+
+
+def list(path_prefix, dirs_only: bool = False, **kwargs) -> typing.List:
+    """
+    Lists parameters with prefixes below the given path.
+
+    This is recursive by default and only returns leafs:
+    use `list-dirs` or pass `--dirs` to get directories only.
+    """
+    # WARNING: do not use `list()` builtin here..
+    secrets = _get_client(**kwargs)
+    if dirs_only:
+        return secrets.children(path_prefix)
+    result = secrets.under(path_prefix).keys()
     result = [x for x in result]
     return result
 
 
 def get_many(namespace, flat_output: bool = False, **kwargs):
     """
-    get many secrets from specified hierarchy/namespace
+    gets many secrets from specified hierarchy/namespace
     """
-    # assert format, "output format is required"
-    secrets = _get_handle(**kwargs)
+    secrets = _get_client(**kwargs)
     result = secrets.under(namespace)
     if flat_output:
         result = util.flatten_output(result)
@@ -89,12 +116,12 @@ def get_many(namespace, flat_output: bool = False, **kwargs):
 
 
 def delete(secret_name, no_backup=False, **kwargs):
-    """delete secret (keeping a local-backup is default)"""
+    """deletes secret (keeping a local-backup is default)"""
 
     def get_backup_file(prefix):
         return ".tmp.{}".format(prefix.replace("/", "_"))
 
-    secrets = _get_handle(**kwargs)
+    secrets = _get_client(**kwargs)
     try:
         parameter = read(secret_name=secret_name, **kwargs)
     except (botocore.exceptions.ClientError,) as exc:
@@ -112,51 +139,83 @@ def delete(secret_name, no_backup=False, **kwargs):
         return False
 
 
-def move(src_name, dest_name, src_env=None, dest_env=None, **kwargs):
-    """moves a secret from src to dest"""
-    result = copy(src_name, dest_name, src_env=src_env, dest_env=dest_env, **kwargs)
-    src_env = Environment.from_profile(src_env)
-    del src_env.secrets[src_name]
+def move(
+    src_name,
+    dst_name,
+    src_profile: str = "default",
+    dst_profile: str = "default",
+    **kwargs,
+):
+    """
+    moves a secret from src to dest
+    """
+    result = copy(
+        src_name, dst_name, src_profile=src_profile, dst_profile=dst_profile, **kwargs
+    )
+    if result:
+        src_profile = Environment.from_profile(src_profile)
+        del src_profile.secrets[src_name]
     return result
 
 
-def move_many(src_name, dest_name, **kwargs):
+def move_many(
+    src_name,
+    dst_name,
+    src_profile: str = "default",
+    dst_profile: str = "default",
+    **kwargs,
+):
     """
     moves a whole path of secrets to a new location
     """
-    dest_name = dest_name[:-1] if dest_name.endswith("/") else dest_name
-    secrets = _get_handle(**kwargs)
-    names = secrets.under(src_name).keys()
-    plan, results = [], []
+    dst_name = dst_name[:-1] if dst_name.endswith("/") else dst_name
+    src_man = _get_client(profile=src_profile)
+    names = [n for n in src_man.under(src_name).keys()]
+    LOGGER.debug(f"moving {len(names)} parameters under `{src_name}`")
+    results = []
     for name in names:
-        leaf = name[len(src_name) :]
-        leaf = leaf[:-1] if leaf.endswith("/") else leaf
-        leaf = leaf[1:] if leaf.startswith("/") else leaf
-        args = (name, "/".join([dest_name, leaf]))
-        LOGGER.debug(f"mv {args} {kwargs}")
-        plan.append([args, kwargs])
-    LOGGER.warning(f"plan:\n{plan}")
-    for args, kwargs in plan:
-        results.append(move(*args, **kwargs))
+        new_name = "/".join([dst_name, name[len(src_name) :]])
+        LOGGER.debug(f"  {name} -> {new_name}")
+        results.append(
+            move(
+                name,
+                new_name,
+                src_profile=src_profile,
+                dst_profile=dst_profile,
+                **kwargs,
+            )
+        )
     return results
 
 
-def copy(src_name, dest_name, src_env=None, dest_env=None, **kwargs):
+def copy(
+    src_name,
+    dst_name,
+    src_profile: str = "default",
+    dst_profile: str = "default",
+    **kwargs,
+):
     """
-    copies a secret from src to dest
+    copies a secret from given source to destination
     """
     # NB: mind the signature, this code is reused by `move`
-    src_env = _get_handle(env=src_env)
-    dest_env = _get_handle(env=dest_env)
-    dest_name = dest_name or src_name
-    value = src_env[src_name]
-    dest_env[dest_name] = value
-    return True
+    src_man = _get_client(profile=src_profile)
+    dst_man = _get_client(profile=dst_profile)
+    dst_name = dst_name or src_name
+    try:
+        value = src_man[src_name]
+    except (botocore.exceptions.ClientError, KeyError) as exc:
+        LOGGER.error(f"Cant retrieve `{src_name}` using profile `{src_man.env.name}`!")
+        LOGGER.warning(f"Hint: Use `ssm copy-many ...` if `{src_name}` is a hierarchy")
+        return False
+    else:
+        dst_man[dst_name] = value
+        return True
 
 
 def update(secret_name, value, file=None, **kwargs):
     """
-    put a secret
+    updates secret in given location with new value
     """
     if all([not value, not file]):
         err = (
@@ -166,7 +225,7 @@ def update(secret_name, value, file=None, **kwargs):
         LOGGER.critical(err)
         raise RuntimeError(err)
     value = value or open(file).read()
-    secrets = _get_handle(**kwargs)
+    secrets = _get_client(**kwargs)
     secrets[secret_name] = value
     return True
 
