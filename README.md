@@ -6,13 +6,13 @@
     </td>
   </tr>
   <tr>
-    <td width=15%><img src=img/icon.png style="width:150px"></td>
+    <td width=15%><img src=https://raw.githubusercontent.com/Robot-Wranglers/ssm-tool/master/img/icon.png style="width:150px"></td>
     <td>
     SSM tool is a small helper for interacting with Amazon Simple Systems Manager, focusing on secrets storage/retrieval.
     <br/><br/>
     <a href=https://pypi.python.org/pypi/aws-ssm-tool/><img src="https://img.shields.io/pypi/l/ssm-tool.svg"></a>
     <a href=https://pypi.python.org/pypi/aws-ssm-tool/><img src="https://badge.fury.io/py/ssm-tool.svg"></a>
-    <a href="https://github.com/elo-enterprises/ssm-tool/actions/workflows/python-test.yml"><img src="https://github.com/elo-enterprises/ssm-tool/actions/workflows/python-test.yml/badge.svg"></a>
+    <a href="https://github.com/Robot-Wranglers/aws-ssm-tool/actions/workflows/python-test.yml"><img src="https://github.com/Robot-Wranglers/aws-ssm-tool/actions/workflows/python-test.yml/badge.svg"></a>
     </td>
   </tr>
 </table>
@@ -42,7 +42,7 @@ See the [Usage section](#usage) for more details.
 
 ## Installation
 
-See [pypi](https://pypi.org/project/aws-ssm-tool/) for available releases.
+See [pypi](https://pypi.org/project/ssm-tool) for available releases.
 
 ```
 pip install aws-ssm-tool
