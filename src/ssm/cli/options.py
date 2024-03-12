@@ -32,16 +32,6 @@ output_format_stdout_default = output_format_partial(required=False, default="st
 output_format_tree_default = output_format_partial(required=False, default="tree")
 
 
-optional_user = user = click.option(
-    "--user",
-    help="username (default will attempt auto-detect)",
-    required=False,
-    default="",
-)
-optional_users = users = click.option(
-    "--users", help="user list (comma-separatted)", required=False, default=""
-)
-
 raw = click.option(
     "--raw", "-r", help="unquotes text return values (like jq -r)", default=False
 )
@@ -109,7 +99,7 @@ dst_profile_partial = partial(
 # required_profile = profile_partial(
 #     required=True,
 # )
-profile = default_profile = profile_partial(
+profile = profile_partial(
     default="default",
     required=False,
 )
