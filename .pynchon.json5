@@ -3,23 +3,10 @@
   // Literals only; no templating please!
   "plugins": [
     // defaults; these are included anyway
-    'globals', 'render', 'gen', 'project', 'plugins',
-    'jinja', 'git', 'core', 'python', 
-    'tests',
-
-    // Recommended for projects with source-code
-    "docs", "src", "github",
-
-    // Standard if there's a python-project
-    "pypi", "python-api", "python-cli", "python-libcst",
-
-    // For projects with intermediate representations
-    "dot",   // graphviz dot-files
+    "globals", "render", "gen", "project", "plugins",
+    "jinja", "git", "core", "github",
+    "python", "pypi", "python-api", "python-cli", "python-libcst",
     "jinja", // projects with templated docs
-    "mermaid",   // mermaid cli
-
-    // Experimental
-    // "griffe",    // ast tool
   ],
   // END: top-level config
   // BEGIN: core plugins-config
@@ -31,12 +18,12 @@
     // use pynchon's context for templating it
     ".libcst.codemod.yaml": {
       "repo_root": "{{src.root}}",
-      "generated_code_marker": '@generated',
-      "formatter": ['black', '-'],
+      "generated_code_marker": "@generated",
+      "formatter": ["black", "-"],
       "blacklist_patterns": [],
       "modules": [
-        'libcst.codemod.commands',
-        'pynchon.codemod.commands',
+        "libcst.codemod.commands",
+        "pynchon.codemod.commands",
       ],
     },
     // "apply_hooks": ["display-modified"],
