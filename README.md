@@ -6,13 +6,13 @@
     </td>
   </tr>
   <tr>
-    <td width=15%><img src=https://raw.githubusercontent.com/Robot-Wranglers/ssm-tool/master/img/icon.png style="width:150px"></td>
+    <td width=15%><img src=https://raw.githubusercontent.com/Robot-Wranglers/aws-ssm-tool/master/img/icon.png style="width:150px"></td>
     <td>
     SSM tool is a small helper for interacting with Amazon Simple Systems Manager, focusing on secrets storage/retrieval.
     <br/><br/>
     <a href=https://pypi.python.org/pypi/aws-ssm-tool/><img src="https://img.shields.io/pypi/l/aws-ssm-tool.svg"></a>
     <a href=https://pypi.python.org/pypi/aws-ssm-tool/><img src="https://badge.fury.io/py/aws-ssm-tool.svg"></a>
-    <a href="https://github.com/Robot-Wranglers/ssm-tool/actions/workflows/python-test.yml"><img src="https://github.com/Robot-Wranglers/ssm-tool/actions/workflows/python-test.yml/badge.svg"></a>
+    <a href="https://github.com/Robot-Wranglers/aws-ssm-tool/actions/workflows/python-test.yml"><img src="https://github.com/Robot-Wranglers/aws-ssm-tool/actions/workflows/python-test.yml/badge.svg"></a>
     </td>
   </tr>
 </table>
@@ -42,7 +42,7 @@ See the [Usage section](#usage) for more details.
 
 ## Installation
 
-See [pypi](https://pypi.org/project/ssm-tool) for available releases.
+See [pypi](https://pypi.org/project/aws-ssm-tool) for available releases.
 
 ```
 pip install aws-ssm-tool
@@ -56,8 +56,9 @@ After installation, you can invoke this tool as either `ssm` or `python -m ssm`.
 
 Usage info follows:
 
-```bash
+Usage info follows:
 
+```bash
 $ ssm --help
 
 Usage: ssm [OPTIONS] COMMAND [ARGS]...
@@ -69,17 +70,22 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  copy       copy a secret
-  delete     delete secret (keeping a local-backup is default)
-  get-many   get many secrets from specified hierarchy/namespace
-  list       list parameters with prefixes below the given path
-  move       move a secret
-  move-many  move a whole path of secrets
+  copy       copies a secret from given source to destination
+  delete     deletes secret (keeping a local-backup is default)
+  get-many   gets many secrets from specified hierarchy/namespace
+  list       Lists parameters with prefixes below the given path.
+  list-dirs  lists subpaths (i.e.
+  move       moves a secret from src to dest
+  move-many  moves a whole path of secrets to a new location
   put-many   put many secrets
-  read       get a secret
+  read       reads a secret
   stat       reports status, including account details and metadata...
-  update     put a secret
+  update     updates secret in given location with new value
+  cp         ALIAS for `copy`
+  get        ALIAS for `read`
+  get-path   ALIAS for `get-many`
   ls         ALIAS for `list`
+  ls-dirs    ALIAS for `list-dirs`
   move-path  ALIAS for `move-many`
   mv         ALIAS for `move`
   mv-many    ALIAS for `move-many`
@@ -91,6 +97,8 @@ Commands:
   st         ALIAS for `stat`
 ```
 
-See [the integration tests](https://github.com/Robot-Wranglers/ssm-tool/tree/master/tests/integration/test.sh) for more examples.
+
+
+See [the integration tests](https://github.com/Robot-Wranglers/aws-ssm-tool/tree/master/tests/integration/test.sh) for more examples.
 
 ---------------------------------------------------------------------------------

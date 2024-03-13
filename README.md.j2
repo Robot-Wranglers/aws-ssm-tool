@@ -49,40 +49,15 @@ After installation, you can invoke this tool as either `ssm` or `python -m ssm`.
 
 Usage info follows:
 
+Usage info follows:
+
+{%- for entrypoint_metadata in python_cli.console_script_entrypoints %}
+{% if entrypoint_metadata.bin_name == 'ssm' %}
 ```bash
-
-$ ssm --help
-
-Usage: ssm [OPTIONS] COMMAND [ARGS]...
-
-  SSM tool, a small helper for interacting with Amazon Simple Systems Manager
-  for secrets storage/retrieval.
-
-Options:
-  --help  Show this message and exit.
-
-Commands:
-  copy       copy a secret
-  delete     delete secret (keeping a local-backup is default)
-  get-many   get many secrets from specified hierarchy/namespace
-  list       list parameters with prefixes below the given path
-  move       move a secret
-  move-many  move a whole path of secrets
-  put-many   put many secrets
-  read       get a secret
-  stat       reports status, including account details and metadata...
-  update     put a secret
-  ls         ALIAS for `list`
-  move-path  ALIAS for `move-many`
-  mv         ALIAS for `move`
-  mv-many    ALIAS for `move-many`
-  mv-path    ALIAS for `move-many`
-  put        ALIAS for `update`
-  put-path   ALIAS for `put-many`
-  rm         ALIAS for `delete`
-  set        ALIAS for `update`
-  st         ALIAS for `stat`
+{{entrypoint_metadata.help_output}}
 ```
+{%endif%}
+{%endfor%}
 
 See [the integration tests]({{github.repo_url}}/tree/master/tests/integration/test.sh) for more examples.
 
