@@ -1,0 +1,21 @@
+name: Docker Build
+on:
+  workflow_call: {}
+  # push:
+  #   branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+    paths-ignore:
+      - '**.md'
+permissions:
+  contents: read
+jobs:
+  test:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        run: make build-docker
+      # - name: Smoke-Test
+      #   run: make smoke-test
