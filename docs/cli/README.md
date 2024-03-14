@@ -6,7 +6,7 @@
 
 ---------------------------------------------------
 
-## **[ℙ][tooltip-package-entrypoints]** `ssm-tool`
+## **[ℙ][tooltip-package-entrypoints]** `aws-ssm-tool`
 
 Package-entrypoint overview for `aws-ssm-tool`
 
