@@ -60,10 +60,9 @@ from rich.default_styles import DEFAULT_STYLES
 
 
 class Fake:
+    """Fake Logger Object"""
+
     warning = debug = info = critical = lambda *args, **kwargs: None
-    # if isinstance(handler, type(logging.StreamHandler())):
-    #     handler.setLevel(logging.DEBUG)
-    #     logger.debug('Debug logging enabled')
 
 
 THEME = Theme(
@@ -71,18 +70,15 @@ THEME = Theme(
         **DEFAULT_STYLES,
         **{
             "logging.keyword": Style(bold=True, color="yellow"),
-            # "logging.level.notset": Style(dim=True),
             "logging.level.debug": Style(color="green"),
             "logging.level.info": Style(
                 dim=True,
-                # color="blue",
             ),
             "logging.level.warning": Style(color="yellow"),
             "logging.level.error": Style(color="red", dim=True, bold=True),
             "logging.level.critical": Style(
                 color="red",
                 bold=True,
-                # reverse=True
             ),
             "log.level": Style.null(),
             "log.time": Style(color="cyan", dim=True),

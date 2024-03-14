@@ -62,6 +62,9 @@ DOCKER_IMAGE_NAME ?= aws-ssm-tool
 docker-build: build-docker
 build-docker:
 	docker build -t $(DOCKER_ORG_NAME)/$(DOCKER_IMAGE_NAME) .
+docker-shell:
+	docker run -it --entrypoint bash \
+		$(DOCKER_ORG_NAME)/$(DOCKER_IMAGE_NAME)
 
 tox-%:
 	tox -e ${*}

@@ -3,7 +3,7 @@
   // Literals only; no templating please!
   "plugins": [
     "globals", "render", "gen", "project",
-    "plugins", "jinja", "git", "core", "github",
+    "plugins", "jinja", "git", "core", "github", "dockerhub",
     "python", "pypi", "python-api", "python-cli", "python-libcst",
   ],
   // END: top-level config
@@ -71,9 +71,11 @@
       ],
       "apply_hooks": [],
   },
-// Config for `project` plugin:
-  "project":{
-    "subproject_patterns": [],
+
+  // Config for `dockerhub` plugin:
+  "dockerhub":{
+    "org_name": "robotwranglers",
+    "repo_name": "aws-ssm-tool",
   },
 
   // END: core plugins-config
