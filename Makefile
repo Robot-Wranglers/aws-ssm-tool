@@ -57,13 +57,12 @@ pypi-release:
 	--password $${PYPI_TOKEN} \
 	dist/*
 
+DOCKER_ORG_NAME ?= robotwranglers
 DOCKER_IMAGE_NAME ?= aws-ssm-tool
 
 docker-build: build-docker
 build-docker:
-	docker build -t $(DOCKER_IMAGE_NAME) .
-
-release: pypi-release docker-release
+	docker build -t $(DOCKER_ORG_NAME)/$(DOCKER_IMAGE_NAME) .
 
 tox-%:
 	tox -e ${*}
