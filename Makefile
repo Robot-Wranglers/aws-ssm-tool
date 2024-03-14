@@ -22,7 +22,6 @@ build: py-build
 clean: py-clean
 
 py-init:
-	# $(call _announce_target, $@)
 	set -x \
 	; pip install build \
 	; pip install --quiet -e .[dev] \
@@ -70,21 +69,23 @@ tox-%:
 normalize: tox-normalize
 lint: static-analysis
 static-analysis: tox-static-analysis
+
 test-units: utest
 test-integrations: itest
 smoke-test: stest
+docker-test:
+	docker run --rm -v `pwd`:/workspace -w /workspace \
+		$(DOCKER_ORG_NAME)/$(DOCKER_IMAGE_NAME)
 itest: tox-itest
 utest: tox-utest
 stest: tox-stest
 test: test-units test-integrations smoke-test
-# coverage:
-# 	echo NotImplementedYet
 
 plan: docs-plan
 apply: docs-apply
 
-docs-plan:
-	tox -e docs-plan
 docs: docs-apply
 docs-apply:
 	tox -e docs
+docs-plan:
+	tox -e docs-plan

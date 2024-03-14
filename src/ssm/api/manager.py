@@ -84,7 +84,7 @@ class SecretManager(abcs.Loggable):
         acc = []
         for k in leafs:
             tmp = k[len(path_prefix) :].split("/")[:-1]
-            for i, c in enumerate(tmp):
+            for i, _ in enumerate(tmp):
                 j = "/".join(tmp[: i + 1])
                 if not flat_output:
                     j = path_prefix + j
