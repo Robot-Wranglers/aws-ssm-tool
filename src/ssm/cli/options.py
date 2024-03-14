@@ -36,10 +36,6 @@ raw = click.option(
     "--raw", "-r", help="unquotes text return values (like jq -r)", default=False
 )
 
-# force_or_dry = force = dry_run = click.option(
-#     "--force/--dry-run", "-f/-d", help="perform actions", default=False, envvar="FORCE"
-# )
-
 optional_prefix = click.option(
     "--prefix", help="src prefix to operate under", required=False, default=""
 )
@@ -96,9 +92,6 @@ dst_profile_partial = partial(
     show_default=True,
 )
 
-# required_profile = profile_partial(
-#     required=True,
-# )
 profile = profile_partial(
     default="default",
     required=False,
@@ -109,13 +102,3 @@ src_profile = src_profile_default = src_profile_partial(
 dst_profile = dst_profile_default = dst_profile_partial(
     default="default", required=False
 )
-# src_profile_no_default = src_profile_partial(default=None, required=False)
-# dst_profile_no_default = dst_profile_partial(default=None, required=False)
-
-# src_prefix = click.option(
-#     "--src-prefix",
-#     envvar="SRC_PREFIX",
-#     help="src prefix to operate under",
-#     required=False,
-#     default="",
-# )

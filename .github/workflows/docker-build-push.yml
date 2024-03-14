@@ -42,7 +42,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: robot-wranglers/aws-ssm-tool
+          images: robotwranglers/aws-ssm-tool
 
       - name: Build and push Docker image
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
@@ -50,5 +50,5 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: robot-wranglers/aws-ssm-tool:latest,robot-wranglers/aws-ssm-tool:4.2,robot-wranglers/aws-ssm-tool:4.2_2015-02-22
+          tags: robotwranglers/aws-ssm-tool:latest
           labels: ${{ steps.meta.outputs.labels }}
