@@ -6,16 +6,16 @@
     </td>
   </tr>
   <tr>
-    <td width=15%><img src=https://raw.githubusercontent.com/Robot-Wranglers/aws-ssm-tool/master/img/icon.png style="width:150px"></td>
+    <td width=15%><img src=https://raw.githubusercontent.com/Robot-Wranglers/ssm/master/img/icon.png style="width:150px"></td>
     <td>
     SSM tool is a small helper for interacting with Amazon Simple Systems Manager, focusing on secrets storage/retrieval.
-    <br/><br/>
-    <a href=https://pypi.python.org/pypi/aws-ssm-tool/><img src="https://img.shields.io/pypi/l/aws-ssm-tool.svg"></a>
-    <a href=https://pypi.python.org/pypi/aws-ssm-tool/><img src="https://badge.fury.io/py/aws-ssm-tool.svg"></a>
-    <a href="https://github.com/Robot-Wranglers/aws-ssm-tool/actions/workflows/python-test.yml"><img src="https://github.com/Robot-Wranglers/aws-ssm-tool/actions/workflows/python-test.yml/badge.svg"></a>
     </td>
   </tr>
 </table>
+<a href=https://pypi.python.org/pypi/aws-ssm-tool/><img src="https://img.shields.io/pypi/l/aws-ssm-tool.svg"></a>
+<a href=https://pypi.python.org/pypi/aws-ssm-tool/><img src="https://badge.fury.io/py/aws-ssm-tool.svg"></a>
+<a href="https://github.com/Robot-Wranglers/ssm/actions/workflows/python-test.yml"><img src="https://github.com/Robot-Wranglers/ssm/actions/workflows/python-test.yml/badge.svg"></a>
+<a href="https://hub.docker.com/r/robotwranglers/aws-ssm-tool/tags"><img src="https://img.shields.io/badge/dockerhub--blue.svg?logo=Docker"></a>
 
 ---------------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ See the [Usage section](#usage) for more details.
 
 ## Installation
 
-See [pypi](https://pypi.org/project/aws-ssm-tool) for available releases.
+See [pypi](https://pypi.org/project/ssm) for available releases.
 
 ```
 pip install aws-ssm-tool
@@ -63,29 +63,25 @@ $ ssm --help
 
 Usage: ssm [OPTIONS] COMMAND [ARGS]...
 
-  SSM tool, a small helper for interacting with Amazon Simple Systems Manager
-  for secrets storage/retrieval.
+  Tool for accessing secrets
 
 Options:
   --help  Show this message and exit.
 
 Commands:
-  copy       copies a secret from given source to destination
-  delete     deletes secret (keeping a local-backup is default)
-  get-many   gets many secrets from specified hierarchy/namespace
-  list       Lists parameters with prefixes below the given path.
-  list-dirs  lists subpaths (i.e.
-  move       moves a secret from src to dest
-  move-many  moves a whole path of secrets to a new location
+  copy       copy a secret
+  delete     delete secret (keeping a local-backup is default)
+  get-many   get many secrets from hierarchy/namespace
+  list       list prefixes below the given path
+  move       move a secret
+  move-many  move a whole path of secrets
   put-many   put many secrets
-  read       reads a secret
-  stat       reports status, including account details and metadata...
-  update     updates secret in given location with new value
+  read       get a secret
+  update     put a secret
   cp         ALIAS for `copy`
   get        ALIAS for `read`
   get-path   ALIAS for `get-many`
   ls         ALIAS for `list`
-  ls-dirs    ALIAS for `list-dirs`
   move-path  ALIAS for `move-many`
   mv         ALIAS for `move`
   mv-many    ALIAS for `move-many`
@@ -94,11 +90,10 @@ Commands:
   put-path   ALIAS for `put-many`
   rm         ALIAS for `delete`
   set        ALIAS for `update`
-  st         ALIAS for `stat`
 ```
 
 
 
-See [the integration tests](https://github.com/Robot-Wranglers/aws-ssm-tool/tree/master/tests/integration/test.sh) for more examples.
+See [the integration tests](https://github.com/Robot-Wranglers/ssm/tree/master/tests/integration/test.sh) for more examples.
 
 ---------------------------------------------------------------------------------
