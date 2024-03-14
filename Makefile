@@ -57,10 +57,11 @@ pypi-release:
 	--password $${PYPI_TOKEN} \
 	dist/*
 
-docker-release: docker-build
-	echo "docker-release not implemented yet"
-docker-build:
-	echo "docker-build not implemented yet"
+DOCKER_IMAGE_NAME ?= aws-ssm-tool
+
+docker-build: build-docker
+build-docker:
+	docker build -t $(DOCKER_IMAGE_NAME) .
 
 release: pypi-release docker-release
 
