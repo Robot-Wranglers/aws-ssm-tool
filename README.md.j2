@@ -62,3 +62,31 @@ Usage info follows:
 See [the integration tests]({{github.repo_url}}/tree/master/tests/integration/test.sh) for more examples.
 
 ---------------------------------------------------------------------------------
+
+## Usage from Docker
+
+If you want to build locally, see the [Dockerfile in this repo](Dockerfile) and use the [Makefile](Makefile):
+
+```bash
+$ make docker-build docker-test
+```
+
+If you don't want to build the container yourself, you can pull it like this:
+
+```bash
+$ docker pull robotwranglers/aws-ssm-tool
+Using default tag: latest
+latest: Pulling from robotwranglers/aws-ssm-tool
+docker.io/robotwranglers/aws-ssm-tool:latest
+```
+
+See a typical invocation below.  The 1st volume is for authenticating with SSM.  The 2nd volume shares the working directory with the container so commands using files (like `ssm put --file ./path/to/file /path/to/key`) can still work.
+
+```bash
+$ docker run \
+  -v ~/.aws:/root/.aws \
+  -v `pwd`:/workspace \
+  -w /workspace \
+  docker.io/robotwranglers/aws-ssm-tool:latest \
+    ssm ls /
+```

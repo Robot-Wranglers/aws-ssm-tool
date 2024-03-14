@@ -1,6 +1,7 @@
 # Git
 .git
 .gitignore
+.github
 
 # CI
 .codeclimate.yml
@@ -40,6 +41,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+.eggs/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -58,6 +60,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+.tmp.*
 
 # Translations
 *.mo
@@ -91,3 +94,15 @@ venv/
 */*.swp
 */*/*.swp
 */*/*/*.swp
+
+tox.ini
+Dockerfile
+Makefile
+img/
+build/
+*.md
+*.md.j2
+[.]*
+docs/
+tests/
+LICENSE
