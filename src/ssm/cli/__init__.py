@@ -1,4 +1,6 @@
 """ ssm.cli (click boilerplate)
+
+Click CLI utilities and command group handling.
 """
 
 import click
@@ -6,6 +8,8 @@ import click
 from ssm import util
 
 from . import args, options  # noqa
+
+__all__ = ["Group", "args", "options"]
 
 LOGGER = util.get_logger(__name__)
 
