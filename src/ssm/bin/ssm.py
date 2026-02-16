@@ -5,8 +5,6 @@
 """
 
 import functools
-import json
-import sys
 
 import click
 import yaml
