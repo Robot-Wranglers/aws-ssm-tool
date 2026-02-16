@@ -1,0 +1,515 @@
+#compdef ssm
+
+# Zsh completion for ssm CLI tool
+# Install: Add to your fpath or source directly
+#   echo 'fpath=(/path/to/completions $fpath)' >> ~/.zshrc
+#   autoload -Uz compinit && compinit
+
+# Cache settings
+typeset -g _ssm_cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/ssm-completion"
+typeset -g _ssm_cache_ttl=300  # 5 minutes
+
+_ssm_get_profile() {
+    local profile=""
+    local i
+    for ((i=1; i < ${#words[@]}; i++)); do
+        if [[ "${words[$i]}" == "--profile" && -n "${words[$((i+1))]}" ]]; then
+            profile="${words[$((i+1))]}"
+            break
+        elif [[ "${words[$i]}" == --profile=* ]]; then
+            profile="${words[$i]#--profile=}"
+            break
+        fi
+    done
+    echo "${profile:-${AWS_PROFILE:-default}}"
+}
+
+_ssm_cache_valid() {
+    local cache_file="$1"
+    [[ -f "$cache_file" ]] || return 1
+    local cache_age=$(( $(date +%s) - $(stat -f%m "$cache_file" 2>/dev/null || stat -c%Y "$cache_file" 2>/dev/null) ))
+    (( cache_age < _ssm_cache_ttl ))
+}
+
+_ssm_list_parameters() {
+    local profile="$(_ssm_get_profile)"
+    local prefix="${1:-/}"
+    local cache_key="${profile}:${prefix}"
+    local cache_file="$_ssm_cache_dir/${cache_key//\//_}"
+
+    mkdir -p "$_ssm_cache_dir" 2>/dev/null
+
+    if _ssm_cache_valid "$cache_file"; then
+        cat "$cache_file"
+        return
+    fi
+
+    # Fetch parameters in background, use cache if available
+    local params
+    if params=$(ssm ls "$prefix" --profile "$profile" --format stdout 2>/dev/null); then
+        echo "$params" > "$cache_file"
+        echo "$params"
+    elif [[ -f "$cache_file" ]]; then
+        cat "$cache_file"
+    fi
+}
+
+_ssm_list_paths() {
+    local profile="$(_ssm_get_profile)"
+    local cache_file="$_ssm_cache_dir/paths_${profile}"
+
+    mkdir -p "$_ssm_cache_dir" 2>/dev/null
+
+    if _ssm_cache_valid "$cache_file"; then
+        cat "$cache_file"
+        return
+    fi
+
+    local paths
+    if paths=$(ssm ls-dirs / --profile "$profile" --format stdout 2>/dev/null); then
+        echo "$paths" > "$cache_file"
+        echo "$paths"
+    elif [[ -f "$cache_file" ]]; then
+        cat "$cache_file"
+    fi
+}
+
+_ssm_complete_parameter() {
+    local params
+    params=("${(@f)$(_ssm_list_parameters /)}")
+    _describe -t parameters 'SSM parameter' params
+}
+
+_ssm_complete_path() {
+    local paths
+    paths=("${(@f)$(_ssm_list_paths)}")
+    paths+=("/")
+    _describe -t paths 'SSM path' paths
+}
+
+_ssm_profiles() {
+    local profiles
+    profiles=(${(f)"$(grep -o '\[profile [^]]*\]' ~/.aws/config 2>/dev/null | sed 's/\[profile \(.*\)\]/\1/' | sort -u)"})
+    profiles+=(${(f)"$(grep -o '^\[[^]]*\]' ~/.aws/credentials 2>/dev/null | tr -d '[]' | sort -u)"})
+    _describe -t profiles 'AWS profile' profiles
+}
+
+_ssm_commands() {
+    local -a commands
+    commands=(
+        'list:List parameters under a path'
+        'ls:List parameters under a path'
+        'list-dirs:List directories under a path'
+        'ls-dirs:List directories under a path'
+        'read:Read a secret value'
+        'get:Read a secret value'
+        'update:Create or update a secret'
+        'put:Create or update a secret'
+        'set:Create or update a secret'
+        'delete:Delete a secret'
+        'rm:Delete a secret'
+        'delete-path:Delete all parameters under a path'
+        'rm-path:Delete all parameters under a path'
+        'copy:Copy a secret'
+        'cp:Copy a secret'
+        'copy-many:Copy all parameters under a path'
+        'cp-many:Copy all parameters under a path'
+        'move:Move a secret'
+        'mv:Move a secret'
+        'move-many:Move all parameters under a path'
+        'mv-many:Move all parameters under a path'
+        'rename:Rename a parameter'
+        'get-many:Get all secrets under a path'
+        'get-path:Get all secrets under a path'
+        'put-many:Put multiple secrets from a file'
+        'put-path:Put multiple secrets from a file'
+        'stat:Show account and parameter stats'
+        'search:Search parameters by name pattern'
+        'find:Search parameters by name pattern'
+        'grep:Search parameters by value content'
+        'count:Count parameters under a path'
+        'tree:Show parameter tree structure'
+        'diff:Compare parameters between paths'
+        'history:Show parameter version history'
+        'hist:Show parameter version history'
+        'tags:Show tags for a parameter'
+        'add-tags:Add tags to a parameter'
+        'remove-tags:Remove tags from a parameter'
+        'backup:Backup parameters to a file'
+        'restore:Restore parameters from a backup'
+        'sync-pull:Pull parameters to local file'
+        'pull:Pull parameters to local file'
+        'sync-push:Push local file to SSM'
+        'push:Push local file to SSM'
+        'sync-diff:Compare local file with SSM'
+        'env-export:Export as environment variables'
+        'env:Export as environment variables'
+        'dotenv:Export as environment variables'
+        'rotate:Rotate a secret value'
+        'generate-secret:Generate a random secret'
+        'audit:Query CloudTrail for SSM events'
+        'validate:Validate parameters against schema'
+        'lint:Lint a parameters file'
+        'inject:Inject SSM values into template'
+        'verify-access:Verify access to parameters'
+        'export-terraform:Export as Terraform resources'
+        'k8s-export:Export as Kubernetes Secret'
+        'rekey:Re-encrypt with new KMS key'
+        'list-by-kms:List parameters by KMS key'
+        'get-policy:Get parameter policy'
+        'set-policy:Set parameter policy'
+        'watch:Watch for parameter changes'
+        'put-template:Create parameters from template'
+    )
+    _describe -t commands 'ssm command' commands
+}
+
+_ssm() {
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+
+    _arguments -C \
+        '--help[Show help message]' \
+        '1: :_ssm_commands' \
+        '*::arg:->args'
+
+    case $state in
+        args)
+            case ${words[1]} in
+                read|get)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--version[Parameter version]:version' \
+                        '1:parameter:_ssm_complete_parameter'
+                    ;;
+                update|put|set)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--file[Read value from file]:file:_files' \
+                        '--stdin[Read value from stdin]' \
+                        '--type[Parameter type]:type:(SecureString String StringList)' \
+                        '1:parameter:_ssm_complete_parameter' \
+                        '2:value'
+                    ;;
+                delete|rm)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--dry-run[Preview without executing]' \
+                        '--no-backup[Do not create backup]' \
+                        '1:parameter:_ssm_complete_parameter'
+                    ;;
+                delete-path|rm-path)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--dry-run[Preview without executing]' \
+                        '--force[Skip confirmation]' \
+                        '--no-backup[Do not create backups]' \
+                        '1:path:_ssm_complete_path'
+                    ;;
+                list|ls)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--dirs-only[Show only directories]' \
+                        '--format[Output format]:format:(tree yaml json stdout)' \
+                        '1:path:_ssm_complete_path'
+                    ;;
+                list-dirs|ls-dirs)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:path:_ssm_complete_path'
+                    ;;
+                copy|cp)
+                    _arguments \
+                        '--src-profile[Source AWS profile]:profile:_ssm_profiles' \
+                        '--dst-profile[Destination AWS profile]:profile:_ssm_profiles' \
+                        '--dry-run[Preview without executing]' \
+                        '1:source:_ssm_complete_parameter' \
+                        '2:destination:_ssm_complete_parameter'
+                    ;;
+                copy-many|cp-many|cp-path|copy-path)
+                    _arguments \
+                        '--src-profile[Source AWS profile]:profile:_ssm_profiles' \
+                        '--dst-profile[Destination AWS profile]:profile:_ssm_profiles' \
+                        '--dry-run[Preview without executing]' \
+                        '1:source path:_ssm_complete_path' \
+                        '2:destination path:_ssm_complete_path'
+                    ;;
+                move|mv)
+                    _arguments \
+                        '--src-profile[Source AWS profile]:profile:_ssm_profiles' \
+                        '--dst-profile[Destination AWS profile]:profile:_ssm_profiles' \
+                        '--dry-run[Preview without executing]' \
+                        '1:source:_ssm_complete_parameter' \
+                        '2:destination:_ssm_complete_parameter'
+                    ;;
+                move-many|mv-many|mv-path|move-path)
+                    _arguments \
+                        '--src-profile[Source AWS profile]:profile:_ssm_profiles' \
+                        '--dst-profile[Destination AWS profile]:profile:_ssm_profiles' \
+                        '--dry-run[Preview without executing]' \
+                        '1:source path:_ssm_complete_path' \
+                        '2:destination path:_ssm_complete_path'
+                    ;;
+                rename|ren)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--dry-run[Preview without executing]' \
+                        '1:old name:_ssm_complete_parameter' \
+                        '2:new name'
+                    ;;
+                get-many|get-path)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--flat[Flat output]' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:namespace:_ssm_complete_path'
+                    ;;
+                put-many|put-path)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--file[Input file]:file:_files' \
+                        '--dry-run[Preview without executing]' \
+                        '--type[Parameter type]:type:(SecureString String StringList)' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:namespace:_ssm_complete_path'
+                    ;;
+                history|hist)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--max-results[Maximum versions to return]:number' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:parameter:_ssm_complete_parameter'
+                    ;;
+                tags|show-tags)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:parameter:_ssm_complete_parameter'
+                    ;;
+                add-tags)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '*--tag[Tag in key=value format]:tag' \
+                        '*-t[Tag in key=value format]:tag' \
+                        '1:parameter:_ssm_complete_parameter'
+                    ;;
+                remove-tags)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '*--key[Tag key to remove]:key' \
+                        '*-k[Tag key to remove]:key' \
+                        '1:parameter:_ssm_complete_parameter'
+                    ;;
+                stat|st)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:path:_ssm_complete_path'
+                    ;;
+                search|find)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--contains[Match parameters containing string]:string' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:pattern'
+                    ;;
+                grep|grep-values)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--regex[Treat pattern as regex]' \
+                        '-r[Treat pattern as regex]' \
+                        '--path[Path prefix to search]:path:_ssm_complete_path' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:pattern'
+                    ;;
+                count|cnt)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--by-type[Break down by parameter type]' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:path:_ssm_complete_path'
+                    ;;
+                tree)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--show-types[Show parameter types]' \
+                        '--show-modified[Show last modified dates]' \
+                        '--max-depth[Maximum depth]:depth' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:path:_ssm_complete_path'
+                    ;;
+                diff|compare)
+                    _arguments \
+                        '--src-profile[Source AWS profile]:profile:_ssm_profiles' \
+                        '--dst-profile[Destination AWS profile]:profile:_ssm_profiles' \
+                        '--show-values[Show actual values]' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:source path:_ssm_complete_path' \
+                        '2:destination path:_ssm_complete_path'
+                    ;;
+                backup)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--no-metadata[Exclude metadata]' \
+                        '1:path:_ssm_complete_path' \
+                        '2:output file:_files'
+                    ;;
+                restore)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--dry-run[Preview without executing]' \
+                        '--target-prefix[Restore to different prefix]:prefix:_ssm_complete_path' \
+                        '--overwrite[Overwrite existing parameters]' \
+                        '1:input file:_files'
+                    ;;
+                sync-pull|pull)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--format[Output format]:format:(yaml json)' \
+                        '1:path:_ssm_complete_path' \
+                        '2:output file:_files'
+                    ;;
+                sync-push|push)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--dry-run[Preview without executing]' \
+                        '--delete-missing[Delete parameters not in file]' \
+                        '--format[Output format]:format:(yaml json)' \
+                        '1:input file:_files' \
+                        '2:path:_ssm_complete_path'
+                    ;;
+                sync-diff|sync-status)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--format[Output format]:format:(yaml json)' \
+                        '1:input file:_files' \
+                        '2:path:_ssm_complete_path'
+                    ;;
+                env-export|env|dotenv)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--prefix[Environment variable prefix]:prefix' \
+                        '--docker[Format as docker --env flags]' \
+                        '--no-quote[Do not quote values]' \
+                        '1:path:_ssm_complete_path'
+                    ;;
+                rotate)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--dry-run[Preview without executing]' \
+                        '--length[Length of new secret]:length' \
+                        '--chars[Character set]:charset:(alphanumeric alpha numeric special all)' \
+                        '1:parameter:_ssm_complete_parameter'
+                    ;;
+                generate-secret)
+                    _arguments \
+                        '--length[Length of secret]:length' \
+                        '--chars[Character set]:charset:(alphanumeric alpha numeric special all)' \
+                        '--exclude[Characters to exclude]:chars'
+                    ;;
+                audit|audit-log)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--since[Time period]:period' \
+                        '--who[Filter by username]:username' \
+                        '--action[Filter by action]:action:(GetParameter PutParameter DeleteParameter)' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:path:_ssm_complete_path'
+                    ;;
+                validate)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--schema[JSON schema file]:file:_files' \
+                        '--exists[Only check existence]' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:path:_ssm_complete_path'
+                    ;;
+                lint)
+                    _arguments \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:input file:_files'
+                    ;;
+                inject)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '-o[Output file]:file:_files' \
+                        '--output[Output file]:file:_files' \
+                        '1:template file:_files'
+                    ;;
+                verify-access|check-access)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:path:_ssm_complete_path'
+                    ;;
+                export-terraform)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '-o[Output file]:file:_files' \
+                        '--output[Output file]:file:_files' \
+                        '1:path:_ssm_complete_path'
+                    ;;
+                k8s-export)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--secret-name[Kubernetes Secret name]:name' \
+                        '--namespace[Kubernetes namespace]:namespace' \
+                        '-o[Output file]:file:_files' \
+                        '--output[Output file]:file:_files' \
+                        '1:path:_ssm_complete_path'
+                    ;;
+                rekey)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--dry-run[Preview without executing]' \
+                        '--from-key[Current KMS key]:key' \
+                        '--to-key[New KMS key]:key' \
+                        '1:path:_ssm_complete_path'
+                    ;;
+                list-by-kms|ls-kms)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--path[Path prefix]:path:_ssm_complete_path' \
+                        '--format[Output format]:format:(yaml json stdout)' \
+                        '1:kms key'
+                    ;;
+                get-policy)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '1:parameter:_ssm_complete_parameter'
+                    ;;
+                set-policy)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--expiration-days[Days until expiration]:days' \
+                        '--notify-before-days[Days before expiration to notify]:days' \
+                        '--no-change-days[Days without changes before notification]:days' \
+                        '1:parameter:_ssm_complete_parameter'
+                    ;;
+                watch)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--interval[Polling interval in seconds]:seconds' \
+                        '1:path:_ssm_complete_path'
+                    ;;
+                put-template)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '--dry-run[Preview without executing]' \
+                        '*--var[Variable in key=value format]:var' \
+                        '*-v[Variable in key=value format]:var' \
+                        '1:template file:_files' \
+                        '2:namespace:_ssm_complete_path'
+                    ;;
+                *)
+                    _arguments \
+                        '--profile[AWS profile]:profile:_ssm_profiles' \
+                        '*:argument'
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+_ssm "$@"

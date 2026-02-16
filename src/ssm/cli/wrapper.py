@@ -2,46 +2,65 @@
     Reusable wrapper for building CLIs
 """
 
-import json
 import functools
+import json
+import typing
 
-import yaml
 import click
+import yaml
 
 from ssm import abcs, util
+
+__all__ = ["ApiWrapper"]
 
 LOGGER = util.get_logger(__file__)
 
 
 class ApiWrapper(abcs.Loggable):
     """
-    a wrapper that turns a API function into a click CLI subcommand
+    A wrapper that turns an API function into a Click CLI subcommand.
+
+    Automatically handles:
+    - Output formatting (json, yaml, env, stdout, tree)
+    - Debug mode (--debug flag)
+    - Quiet mode (--quiet flag)
+    - Command aliasing
     """
 
     BASE_OPTIONS = [
-        # every command gets the --debug option
         click.option(
             "--debug",
             default=False,
             is_flag=True,
-            help="Enables verbose mode.",
+            help="Enable verbose debug output.",
+        ),
+        click.option(
+            "--quiet",
+            "-q",
+            default=False,
+            is_flag=True,
+            help="Suppress non-essential output.",
         ),
     ]
 
     def __init__(
         self,
-        command_name=None,
-        publishers=[],
-        subcommand_name=None,
-        fxn=None,
-        extra_options=None,
-        aliases=[],
-        help=None,
+        command_name: typing.Optional[str] = None,
+        publishers: typing.List = None,
+        subcommand_name: typing.Optional[str] = None,
+        fxn: typing.Callable = None,
+        extra_options: typing.List = None,
+        aliases: typing.List[str] = None,
+        help: typing.Optional[str] = None,
         entry=None,
     ):
+        publishers = publishers or []
+        aliases = aliases or []
+        extra_options = extra_options or []
+
         self.entry = entry
         self.aliases = aliases
-        self.is_subcommand = isinstance(self.entry, (click.core.Group,))
+        self.is_subcommand = isinstance(self.entry, click.core.Group)
         self.is_stand_alone = self.entry is None
         self.subcommand_name = self.name = subcommand_name or fxn.__name__.replace(
             "_", "-"
@@ -60,62 +79,41 @@ class ApiWrapper(abcs.Loggable):
         if not (self.is_subcommand or self.is_stand_alone):
             err = (
                 "expected a group or a standalone "
-                "command, got {} of type {} for entry"
+                f"command, got {self.entry} of type {type(self.entry)} for entry"
             )
-            err = err.format(self.entry, type(self.entry))
             raise ValueError(err)
         super().__init__()
 
     def get_proxy(self):
-        """ """
-        options = self.extra_options
+        """Create the proxy function that wraps the API function."""
+        options = self.extra_options.copy()
         if self.is_subcommand:
             # otherwise base options would be added twice for stand-alone style CLIs
             options += self.__class__.BASE_OPTIONS
 
         @functools.wraps(self.fxn)
         def proxy(*args, **kwargs):
-            """ """
-            args = [x for x in args if not isinstance(x, (click.core.Context,))]
-            # LOGGER.info(f"proxying args={args}, kwargs={kwargs}")
-            format = kwargs.get("format", "stdout")
+            """Proxy function that handles debug/quiet modes and output formatting."""
+            args = [x for x in args if not isinstance(x, click.core.Context)]
+
+            # Handle debug mode
+            debug = kwargs.pop("debug", False)
+            if debug:
+                util.set_log_level("DEBUG")
+
+            # Handle quiet mode
+            quiet = kwargs.pop("quiet", False)
+            if quiet:
+                util.set_log_level("ERROR")
+
+            output_format = kwargs.get("format", "stdout")
             result = self.fxn(*args, **kwargs)
-            if format in ["yaml", "yml"]:
-                print(yaml.dump(result))
-            elif format in ["json"]:
-                print(json.dumps(result))
-            elif format in ["python"]:
-                print(result)
-            elif format in ["env"]:
-                assert isinstance(result, (dict,)), f"expected dict, got {type(result)}"
-                acc = []
-                for k, v in result.items():
-                    if isinstance(v, (str,)) and " " in v:
-                        msg = "user requested format is `env` but value has a space character!"
-                        LOGGER.warning(msg)
-                    tmp = "=".join([k.split("/")[-1], v])
-                    acc.append(tmp)
-                print("\n".join(acc))
-            elif format in ["stdout", "tree"]:
-                if isinstance(result, (type([]),)):
-                    # if format=='tree':
-                    #     tree={}
-                    #     for path_prefix in result:
-                    #         for comp in path_prefix.split('/'):
-                    #             tree[path_prefix]=
-                    # else:
-                    print("\n".join([str(x) for x in result]))
-                elif isinstance(result, (dict,)):
-                    tree = util.Tree(
-                        "",
-                        guide_style="bold bright_blue",
-                    )
-                    util.rich_walk_dict(result, tree)
-                    util.rich_print(tree)
-                else:
-                    util.rich_print(result)
-            else:
-                raise RuntimeError(f"unrecognized output format `{format}`")
+
+            # In quiet mode, only output if there's a result and it's not a success bool
+            if quiet and (result is True or result is None):
+                return
+
+            self._format_output(result, output_format, quiet)
 
         for option in options:
             proxy = option(proxy)
@@ -130,9 +128,49 @@ class ApiWrapper(abcs.Loggable):
         elif self.entry is None:
             result = click.command()(proxy)
         else:
-            err = "unknown entry type '{}' for '{}'".format(
-                type(self.entry), self.entry
-            )
+            err = f"unknown entry type '{type(self.entry)}' for '{self.entry}'"
             LOGGER.critical(err)
             raise RuntimeError(err)
         return result
+
+    def _format_output(
+        self, result: typing.Any, output_format: str, quiet: bool = False
+    ) -> None:
+        """Format and print the result based on the output format."""
+        if result is None:
+            return
+
+        if output_format in ["yaml", "yml"]:
+            print(yaml.dump(result, default_flow_style=False))
+        elif output_format == "json":
+            print(json.dumps(result, indent=2, default=str))
+        elif output_format == "python":
+            print(result)
+        elif output_format == "env":
+            if not isinstance(result, dict):
+                raise ValueError(f"env format requires dict, got {type(result)}")
+            acc = []
+            for k, v in result.items():
+                if isinstance(v, str) and " " in v:
+                    LOGGER.warning(
+                        "env format value contains space - may cause issues"
+                    )
+                tmp = "=".join([k.split("/")[-1], str(v)])
+                acc.append(tmp)
+            print("\n".join(acc))
+        elif output_format in ["stdout", "tree"]:
+            if isinstance(result, list):
+                for item in result:
+                    print(str(item))
+            elif isinstance(result, dict):
+                tree = util.Tree("", guide_style="bold bright_blue")
+                util.rich_walk_dict(result, tree)
+                util.rich_print(tree)
+            elif isinstance(result, bool):
+                # Don't print True/False for success indicators
+                if not result:
+                    print("Operation failed")
+            else:
+                util.rich_print(result)
+        else:
+            raise RuntimeError(f"unrecognized output format `{output_format}`")
